@@ -1,0 +1,224 @@
+# Contract Addresses
+
+Complete reference of all FEY Protocol contracts deployed on Base Mainnet.
+
+## Base Mainnet (Chain ID: 8453)
+
+### Core Contracts
+
+| Contract | Address | Description |
+|----------|---------|-------------|
+| **Factory (Fey.sol)** | [`0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d`](https://basescan.org/address/0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d) | Main factory for token deployments |
+| **FEY Token** | [`0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`](https://basescan.org/address/0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D) | Native protocol token (100B supply) |
+| **Hook (FeyHookStaticFeeV2)** | [`0x5B409184204b86f708d3aeBb3cad3F02835f68cC`](https://basescan.org/address/0x5B409184204b86f708d3aeBb3cad3F02835f68cC) | Uniswap V4 hook for fee management |
+
+### Supporting Infrastructure
+
+| Contract | Address | Description |
+|----------|---------|-------------|
+| **LP Locker (FeyLpLockerMultiple)** | [`0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa`](https://basescan.org/address/0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa) | Manages LP positions and rewards |
+| **Fee Locker (FeyFeeLocker)** | [`0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6`](https://basescan.org/address/0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6) | Stores and distributes protocol fees |
+| **Pool Extension Allowlist** | [`0xFD549237CdEAbDc14438CAF3f3861e174fDEae46`](https://basescan.org/address/0xFD549237CdEAbDc14438CAF3f3861e174fDEae46) | Controls approved pool extensions |
+
+### Extensions
+
+| Extension | Address | Purpose |
+|-----------|---------|---------|
+| **FeyUniv4EthDevBuy** | [`0x173077c319c38bb08D4C4968014357fd518446b4`](https://basescan.org/address/0x173077c319c38bb08D4C4968014357fd518446b4) | ETH-based token purchases during deployment |
+
+### MEV Protection
+
+| Contract | Address | Description |
+|----------|---------|-------------|
+| **FeyMevNoop** | [`0x2ebc0fA629b268dFA3d455b67027d507a562EAC0`](https://basescan.org/address/0x2ebc0fA629b268dFA3d455b67027d507a562EAC0) | No-op MEV module (template) |
+
+### Key Addresses
+
+| Role | Address | Purpose |
+|------|---------|---------|
+| **Team Fee Recipient** | [`0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50`](https://basescan.org/address/0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50) | Receives protocol fees for distribution |
+
+## Pool Information
+
+### Main Pool (FEY/WETH)
+
+| Property | Value |
+|----------|--------|
+| **Pool ID** | `0xe155c517c53f078f4b443c99436e42c1b80fd2fb1b3508f431c46b8365e4f3f0` |
+| **Currency0** | WETH (`0x4200000000000000000000000000000000000006`) |
+| **Currency1** | FEY (`0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`) |
+| **Fee Flag** | Dynamic (0x800000) |
+| **Tick Spacing** | 200 |
+| **Hook** | FeyHookStaticFeeV2 (`0x5B409184204b86f708d3aeBb3cad3F02835f68cC`) |
+
+## External Dependencies
+
+### Uniswap V4
+
+| Contract | Address | Description |
+|----------|---------|-------------|
+| **Pool Manager** | TBD | Uniswap V4 core pool manager |
+| **Position Manager** | TBD | Uniswap V4 position manager |
+
+### Permit2
+
+| Contract | Address | Description |
+|----------|---------|-------------|
+| **Permit2** | [`0x000000000022D473030F116dDEE9F6B43aC78BA3`](https://basescan.org/address/0x000000000022D473030F116dDEE9F6B43aC78BA3) | Universal approval interface |
+
+### Base Infrastructure
+
+| Contract | Address | Description |
+|----------|---------|-------------|
+| **WETH** | [`0x4200000000000000000000000000000000000006`](https://basescan.org/address/0x4200000000000000000000000000000000000006) | Wrapped ETH on Base |
+| **Superchain Token Bridge** | [`0x4200000000000000000000000000000000000010`](https://basescan.org/address/0x4200000000000000000000000000000000000010) | Cross-chain token bridge |
+
+## Network Details
+
+### Base Mainnet
+
+| Property | Value |
+|----------|--------|
+| **Chain ID** | 8453 |
+| **RPC URL** | `https://mainnet.base.org` |
+| **Explorer** | [BaseScan](https://basescan.org) |
+| **Native Token** | ETH |
+| **Bridge** | [Base Bridge](https://bridge.base.org) |
+
+## Contract Verification
+
+All contracts are verified on BaseScan with source code available:
+
+### Factory
+- **Address**: `0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d`
+- **Verification**: [View on BaseScan →](https://basescan.org/address/0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d#code)
+
+### FEY Token
+- **Address**: `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`
+- **Verification**: [View on BaseScan →](https://basescan.org/address/0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D#code)
+
+### Hook
+- **Address**: `0x5B409184204b86f708d3aeBb3cad3F02835f68cC`
+- **Verification**: [View on BaseScan →](https://basescan.org/address/0x5B409184204b86f708d3aeBb3cad3F02835f68cC#code)
+
+## Integration Examples
+
+### Web3 Configuration
+
+```javascript
+// Base mainnet configuration
+const baseConfig = {
+  chainId: 8453,
+  name: 'Base Mainnet',
+  rpcUrl: 'https://mainnet.base.org',
+  blockExplorer: 'https://basescan.org',
+  contracts: {
+    factory: '0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d',
+    feyToken: '0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D',
+    hook: '0x5B409184204b86f708d3aeBb3cad3F02835f68cC',
+    feeLocker: '0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6',
+    lpLocker: '0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa',
+  }
+};
+```
+
+### Contract Instances
+
+```javascript
+import { ethers } from 'ethers';
+
+// Provider setup
+const provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
+
+// Contract instances
+const factory = new ethers.Contract(
+  '0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d',
+  factoryABI,
+  provider
+);
+
+const feyToken = new ethers.Contract(
+  '0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D',
+  erc20ABI,
+  provider
+);
+
+const hook = new ethers.Contract(
+  '0x5B409184204b86f708d3aeBb3cad3F02835f68cC',
+  hookABI,
+  provider
+);
+```
+
+### Environment Variables
+
+```bash
+# Base mainnet configuration
+export CHAIN_ID=8453
+export RPC_URL="https://mainnet.base.org"
+export FACTORY_ADDRESS="0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d"
+export FEY_TOKEN_ADDRESS="0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D"
+export HOOK_ADDRESS="0x5B409184204b86f708d3aeBb3cad3F02835f68cC"
+export FEE_LOCKER_ADDRESS="0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6"
+export LP_LOCKER_ADDRESS="0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa"
+```
+
+### Cast Commands
+
+```bash
+# Set environment for easier commands
+export RPC="https://mainnet.base.org"
+export FACTORY="0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d"
+export FEY="0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D"
+
+# Quick status checks
+cast call $FACTORY "deprecated()(bool)" --rpc-url $RPC
+cast call $FEY "totalSupply()(uint256)" --rpc-url $RPC
+```
+
+## Security Notes
+
+### Contract Immutability
+
+**Immutable Contracts:**
+- Factory core logic (deployment functions)
+- Token contracts (ERC20 functionality)
+- Hook swap logic (fee collection)
+
+**Upgradeable Components:**
+- System configuration (admin functions)
+- Module enablement (hooks, lockers, extensions)
+- Fee routing (can be frozen)
+
+### Admin Controls
+
+**Factory Owner:**
+- Enable/disable system modules
+- Set system-wide configuration
+- Freeze critical parameters
+
+**Token Admins:**
+- Update token metadata
+- Transfer admin role
+- Verify token authenticity
+
+### Access Patterns
+
+**Public Functions:**
+- Token deployment (`deployToken`)
+- Fee claiming (`claimWethFees`, `claimBaseTokenFees`)
+- Reward collection (`collectRewards`)
+
+**Permissioned Functions:**
+- System configuration (owner/admin only)
+- Module management (owner/admin only)
+- Critical parameter changes (owner only)
+
+---
+
+## Related Documentation
+
+- **Contract Details**: [Core Contracts →](/contracts/factory)
+- **Integration Guide**: [Developer Guides →](/guides/integration)
+- **State Queries**: [Cast Commands →](/guides/cast-commands)
+- **Troubleshooting**: [Support →](/support/troubleshooting)

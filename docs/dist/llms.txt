@@ -1,0 +1,29 @@
+# FEY Protocol
+
+> The first fully permissionless, user-owned launchpad
+
+## Docs
+
+- [Key Concepts](/concepts): Understanding these core concepts will help you grasp how FEY Protocol creates a self-sustaining, user-owned launchpad network.
+- [Example](/example): This is an example page.
+- [Frequently Asked Questions](/faq): Common questions about FEY Protocol, how it works, and how to participate.
+- [Getting Started](/getting-started): This guide will help you start using FEY Protocol, whether you want to stake $FEY, deploy a token, or integrate with the protocol.
+- [What is FEY Protocol?](/introduction): FEY Protocol is the first fully permissionless, user-owned launchpad built on Base. Unlike traditional launchpads owned by corporations, FEY operates as decentralized public infrastructure where users gain real ownership through staking.
+- [Admin](/support/admin): This page covers administrative functions and procedures.
+- [Security](/support/security): This page covers security considerations and best practices for the Fey protocol.
+- [Troubleshooting](/support/troubleshooting): Common issues and solutions when working with FEY Protocol.
+- [Contract Addresses](/reference/addresses): Complete reference of all FEY Protocol contracts deployed on Base Mainnet.
+- [Cast Commands Guide](/guides/cast-commands): Complete reference for querying FEY Protocol state using Foundry's `cast` command-line tool.
+- [Extensions](/guides/extensions): This page provides information about extending the Fey protocol.
+- [Integration Guide](/guides/integration): Learn how to integrate FEY Protocol into your application, from basic queries to full deployment interfaces.
+- [Queries](/guides/queries): This page provides guidance on querying the Fey protocol.
+- [Token Deployment](/flows/deployment): Learn how to deploy tokens on the FEY Protocol, including configuration options, best practices, and the complete deployment flow.
+- [Fee Flow](/flows/fees): This page explains how fees are processed and distributed.
+- [Swapping Flow](/flows/swapping): This page describes the token swapping process in the Fey protocol.
+- [Factory Contract](/contracts/factory): The Factory is the central orchestrator of the FEY Protocol, responsible for token deployment, system configuration, and fee management.
+- [Hook Contract](/contracts/hook): This page documents the Hook contract functionality.
+- [FEY Token Contract](/contracts/token): The FEY Token is the native token of the FEY Protocol, serving as the base pairing token for all deployments and the reward/governance token for the network.
+- [Contracts](/architecture/contracts): This page provides an overview of all smart contracts in the Fey protocol.
+- [Fees](/architecture/fees): This page explains the fee structure and mechanism in the Fey protocol.
+- [Protocol Overview](/architecture/overview): FEY Protocol is built as a layered system on top of Uniswap V4, creating the first fully permissionless, user-owned launchpad. This page explains the high-level architecture and how all components work together.
+- [Tokenomics](/architecture/tokenomics): This page explains the token economics and mechanisms of the Fey protocol.

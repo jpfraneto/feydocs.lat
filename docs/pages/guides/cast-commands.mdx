@@ -1,0 +1,497 @@
+# Cast Commands Guide
+
+Complete reference for querying FEY Protocol state using Foundry's `cast` command-line tool.
+
+## Quick Setup
+
+```bash
+# Set environment variables for easier usage
+export RPC_URL="https://mainnet.base.org"
+export FACTORY="0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d"
+export FEY_TOKEN="0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D"
+export HOOK="0x5B409184204b86f708d3aeBb3cad3F02835f68cC"
+export FEE_LOCKER="0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6"
+export LP_LOCKER="0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa"
+export POOL_ID="0xe155c517c53f078f4b443c99436e42c1b80fd2fb1b3508f431c46b8365e4f3f0"
+```
+
+## Factory Contract Queries
+
+### System Status
+
+```bash
+# Check if factory is deprecated
+cast call $FACTORY "deprecated()(bool)" --rpc-url $RPC_URL
+
+# Get base token (should be FEY)
+cast call $FACTORY "baseToken()(address)" --rpc-url $RPC_URL
+
+# Get team fee recipient
+cast call $FACTORY "teamFeeRecipient()(address)" --rpc-url $RPC_URL
+
+# Get fee locker address
+cast call $FACTORY "feeLocker()(address)" --rpc-url $RPC_URL
+
+# Check freeze status
+cast call $FACTORY "freezeFeeRecipient()(bool)" --rpc-url $RPC_URL
+cast call $FACTORY "feeLockerFrozen()(bool)" --rpc-url $RPC_URL
+```
+
+### Module Configuration
+
+```bash
+# Check if hook is enabled
+cast call $FACTORY "enabledHooks(address)(bool)" $HOOK --rpc-url $RPC_URL
+
+# Check if locker is enabled for hook
+cast call $FACTORY "enabledLockers(address,address)(bool)" $LP_LOCKER $HOOK --rpc-url $RPC_URL
+
+# Check if dev buy extension is enabled  
+cast call $FACTORY "enabledExtensions(address)(bool)" 0x173077c319c38bb08D4C4968014357fd518446b4 --rpc-url $RPC_URL
+
+# Check if MEV module is enabled
+cast call $FACTORY "enabledMevModules(address)(bool)" 0x2ebc0fA629b268dFA3d455b67027d507a562EAC0 --rpc-url $RPC_URL
+```
+
+### Token Deployment Info
+
+```bash
+# Get deployment details for any token (example with FEY)
+cast call $FACTORY \
+  "tokenDeploymentInfo(address)((address,address,address,address[]))" \
+  $FEY_TOKEN \
+  --rpc-url $RPC_URL
+
+# Returns: (locker, token, hook, extensions[])
+# Expected for FEY: (0x975...7Fa, 0xD09...91D, 0x5B4...8cC, [0x173...4b4, ...])
+```
+
+## FEY Token Queries
+
+### Basic Token Information
+
+```bash
+# Token metadata
+cast call $FEY_TOKEN "name()(string)" --rpc-url $RPC_URL
+cast call $FEY_TOKEN "symbol()(string)" --rpc-url $RPC_URL
+cast call $FEY_TOKEN "decimals()(uint8)" --rpc-url $RPC_URL
+
+# Supply information (should be 100B with 18 decimals)
+cast call $FEY_TOKEN "totalSupply()(uint256)" --rpc-url $RPC_URL
+# Expected: 100000000000000000000000000000 (100B * 10^18)
+
+# Check any address balance
+cast call $FEY_TOKEN "balanceOf(address)(uint256)" [ADDRESS] --rpc-url $RPC_URL
+```
+
+### Token Metadata & Admin
+
+```bash
+# Get all token data in one call
+cast call $FEY_TOKEN "allData()(address,address,string,string,string)" --rpc-url $RPC_URL
+
+# Individual metadata queries
+cast call $FEY_TOKEN "admin()(address)" --rpc-url $RPC_URL
+cast call $FEY_TOKEN "originalAdmin()(address)" --rpc-url $RPC_URL
+cast call $FEY_TOKEN "imageUrl()(string)" --rpc-url $RPC_URL
+cast call $FEY_TOKEN "metadata()(string)" --rpc-url $RPC_URL
+cast call $FEY_TOKEN "context()(string)" --rpc-url $RPC_URL
+
+# Verification status
+cast call $FEY_TOKEN "isVerified()(bool)" --rpc-url $RPC_URL
+```
+
+### Governance Features
+
+```bash
+# Get voting power (requires delegation first)
+cast call $FEY_TOKEN "getCurrentVotes(address)(uint256)" [ADDRESS] --rpc-url $RPC_URL
+
+# Check delegation
+cast call $FEY_TOKEN "delegates(address)(address)" [ADDRESS] --rpc-url $RPC_URL
+
+# Get historical voting power
+cast call $FEY_TOKEN "getPriorVotes(address,uint256)(uint256)" [ADDRESS] [BLOCK_NUMBER] --rpc-url $RPC_URL
+```
+
+## Hook Contract Queries
+
+### Pool Configuration
+
+```bash
+# Check if FEY is token0 in main pool
+cast call $HOOK "feyIsToken0(bytes32)(bool)" $POOL_ID --rpc-url $RPC_URL
+
+# Get locker for pool
+cast call $HOOK "locker(bytes32)(address)" $POOL_ID --rpc-url $RPC_URL
+
+# Get pool fees (directional)
+cast call $HOOK "feyFee(bytes32)(uint24)" $POOL_ID --rpc-url $RPC_URL
+cast call $HOOK "pairedFee(bytes32)(uint24)" $POOL_ID --rpc-url $RPC_URL
+
+# Current protocol fee rate
+cast call $HOOK "protocolFee()(uint24)" --rpc-url $RPC_URL
+```
+
+### MEV Protection Status
+
+```bash
+# Check if MEV module is enabled for pool
+cast call $HOOK "mevModuleEnabled(bytes32)(bool)" $POOL_ID --rpc-url $RPC_URL
+
+# Get pool creation timestamp
+cast call $HOOK "poolCreationTimestamp(bytes32)(uint256)" $POOL_ID --rpc-url $RPC_URL
+
+# Get MEV module for pool
+cast call $HOOK "mevModule(bytes32)(address)" $POOL_ID --rpc-url $RPC_URL
+```
+
+### Pool Extensions
+
+```bash
+# Get pool extension (if any)
+cast call $HOOK "poolExtension(bytes32)(address)" $POOL_ID --rpc-url $RPC_URL
+
+# Check if extension is set up
+cast call $HOOK "poolExtensionSetup(bytes32)(bool)" $POOL_ID --rpc-url $RPC_URL
+```
+
+### Constants & Limits
+
+```bash
+# Protocol limits
+cast call $HOOK "MAX_LP_FEE()(uint24)" --rpc-url $RPC_URL
+cast call $HOOK "MAX_MEV_LP_FEE()(uint24)" --rpc-url $RPC_URL
+cast call $HOOK "MAX_MEV_MODULE_DELAY()(uint256)" --rpc-url $RPC_URL
+cast call $HOOK "PROTOCOL_FEE_NUMERATOR()(uint256)" --rpc-url $RPC_URL
+```
+
+## Fee Locker Queries
+
+### Available Fees
+
+```bash
+# Check available fees for specific owner and token
+cast call $FEE_LOCKER \
+  "availableFees(address,address)(uint256)" \
+  [FEE_OWNER] [TOKEN_ADDRESS] \
+  --rpc-url $RPC_URL
+
+# Check team recipient's FEY fees
+cast call $FEE_LOCKER \
+  "availableFees(address,address)(uint256)" \
+  0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50 \
+  $FEY_TOKEN \
+  --rpc-url $RPC_URL
+```
+
+### Configuration
+
+```bash
+# Get vault address
+cast call $FEE_LOCKER "vault()(address)" --rpc-url $RPC_URL
+
+# Check if address is allowed depositor
+cast call $FEE_LOCKER "allowedDepositors(address)(bool)" [ADDRESS] --rpc-url $RPC_URL
+
+# Raw fees mapping
+cast call $FEE_LOCKER \
+  "feesToClaim(address,address)(uint256)" \
+  [FEE_OWNER] [TOKEN_ADDRESS] \
+  --rpc-url $RPC_URL
+```
+
+## LP Locker Queries
+
+### Token Reward Information
+
+```bash
+# Get complete token reward info for FEY
+cast call $LP_LOCKER "tokenRewards(address)" $FEY_TOKEN --rpc-url $RPC_URL
+
+# This returns a complex struct with:
+# - token address
+# - poolKey (5-element tuple)
+# - positionId (NFT ID)
+# - numPositions
+# - rewardBps array
+# - rewardAdmins array  
+# - rewardRecipients array
+```
+
+### Configuration
+
+```bash
+# System configuration
+cast call $LP_LOCKER "factory()(address)" --rpc-url $RPC_URL
+cast call $LP_LOCKER "feeLocker()(address)" --rpc-url $RPC_URL
+cast call $LP_LOCKER "positionManager()(address)" --rpc-url $RPC_URL
+cast call $LP_LOCKER "permit2()(address)" --rpc-url $RPC_URL
+
+# Constants
+cast call $LP_LOCKER "BASIS_POINTS()(uint256)" --rpc-url $RPC_URL
+cast call $LP_LOCKER "MAX_REWARD_PARTICIPANTS()(uint256)" --rpc-url $RPC_URL
+cast call $LP_LOCKER "MAX_LP_POSITIONS()(uint256)" --rpc-url $RPC_URL
+```
+
+## Fee Balance Monitoring
+
+### Factory Balances
+
+```bash
+# Check factory's WETH balance (for buybacks)
+cast call 0x4200000000000000000000000000000000000006 \
+  "balanceOf(address)(uint256)" $FACTORY \
+  --rpc-url $RPC_URL
+
+# Check factory's FEY balance (should route to fee locker)
+cast call $FEY_TOKEN \
+  "balanceOf(address)(uint256)" $FACTORY \
+  --rpc-url $RPC_URL
+```
+
+### Team Recipient Balances
+
+```bash
+# Team recipient's FEY balance
+cast call $FEY_TOKEN \
+  "balanceOf(address)(uint256)" 0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50 \
+  --rpc-url $RPC_URL
+
+# Team recipient's WETH balance
+cast call 0x4200000000000000000000000000000000000006 \
+  "balanceOf(address)(uint256)" 0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50 \
+  --rpc-url $RPC_URL
+```
+
+## Extension Queries
+
+### Pool Extension Allowlist
+
+```bash
+# Check if extension is enabled
+cast call 0xFD549237CdEAbDc14438CAF3f3861e174fDEae46 \
+  "enabledExtensions(address)(bool)" [EXTENSION_ADDRESS] \
+  --rpc-url $RPC_URL
+
+# Check dev buy extension
+cast call 0xFD549237CdEAbDc14438CAF3f3861e174fDEae46 \
+  "enabledExtensions(address)(bool)" 0x173077c319c38bb08D4C4968014357fd518446b4 \
+  --rpc-url $RPC_URL
+```
+
+## Operational Commands
+
+:::warning[Requires Private Key]
+These commands modify state and require a funded wallet with private key.
+:::
+
+### Fee Claims (Public Functions)
+
+```bash
+# Claim WETH fees from factory (anyone can call)
+cast send $FACTORY "claimWethFees()" \
+  --private-key $PRIVATE_KEY \
+  --rpc-url $RPC_URL
+
+# Claim FEY fees from factory (anyone can call)  
+cast send $FACTORY "claimBaseTokenFees()" \
+  --private-key $PRIVATE_KEY \
+  --rpc-url $RPC_URL
+
+# Collect rewards for a token (anyone can call)
+cast send $LP_LOCKER "collectRewards(address)" $FEY_TOKEN \
+  --private-key $PRIVATE_KEY \
+  --rpc-url $RPC_URL
+```
+
+### Personal Fee Claims
+
+```bash
+# Claim your personal fees from fee locker
+cast send $FEE_LOCKER \
+  "claim(address,address)" $MY_ADDRESS $TOKEN_ADDRESS \
+  --private-key $PRIVATE_KEY \
+  --rpc-url $RPC_URL
+```
+
+## Advanced Queries
+
+### Pool ID Verification
+
+```bash
+# Verify the FEY/WETH pool ID calculation
+# Pool ID should be: 0xe155c517c53f078f4b443c99436e42c1b80fd2fb1b3508f431c46b8365e4f3f0
+
+# Components:
+# currency0: 0x4200000000000000000000000000000000000006 (WETH)
+# currency1: 0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D (FEY)  
+# fee: 0x800000 (DYNAMIC_FEE_FLAG)
+# tickSpacing: 200
+# hooks: 0x5B409184204b86f708d3aeBb3cad3F02835f68cC
+```
+
+### Event Monitoring
+
+```bash
+# Get recent TokenCreated events
+cast logs \
+  --from-block 12000000 \
+  --to-block latest \
+  --address $FACTORY \
+  --event-signature "TokenCreated(address,address,address,string,string,string,string,string,address,bytes32,int24,address,address,address,uint256,address[])" \
+  --rpc-url $RPC_URL
+
+# Get recent fee claim events  
+cast logs \
+  --from-block 12000000 \
+  --to-block latest \
+  --address $FACTORY \
+  --event-signature "ClaimFees(address,address,uint256)" \
+  --rpc-url $RPC_URL
+```
+
+## Batch Queries
+
+### System Health Check
+
+Create a script to check overall system status:
+
+```bash
+#!/bin/bash
+# system_check.sh
+
+echo "=== FEY Protocol System Check ==="
+echo
+
+echo "Factory Status:"
+echo "- Deprecated: $(cast call $FACTORY 'deprecated()(bool)' --rpc-url $RPC_URL)"
+echo "- Base Token: $(cast call $FACTORY 'baseToken()(address)' --rpc-url $RPC_URL)"
+echo "- Fee Recipient: $(cast call $FACTORY 'teamFeeRecipient()(address)' --rpc-url $RPC_URL)"
+echo
+
+echo "FEY Token:"
+echo "- Total Supply: $(cast call $FEY_TOKEN 'totalSupply()(uint256)' --rpc-url $RPC_URL)"
+echo "- Verified: $(cast call $FEY_TOKEN 'isVerified()(bool)' --rpc-url $RPC_URL)"
+echo
+
+echo "Main Pool ($POOL_ID):"
+echo "- FEY is Token0: $(cast call $HOOK 'feyIsToken0(bytes32)(bool)' $POOL_ID --rpc-url $RPC_URL)"
+echo "- FEY Fee: $(cast call $HOOK 'feyFee(bytes32)(uint24)' $POOL_ID --rpc-url $RPC_URL)"
+echo "- Paired Fee: $(cast call $HOOK 'pairedFee(bytes32)(uint24)' $POOL_ID --rpc-url $RPC_URL)"
+echo
+
+echo "Fee Balances:"
+echo "- Factory WETH: $(cast call 0x4200000000000000000000000000000000000006 'balanceOf(address)(uint256)' $FACTORY --rpc-url $RPC_URL)"
+echo "- Factory FEY: $(cast call $FEY_TOKEN 'balanceOf(address)(uint256)' $FACTORY --rpc-url $RPC_URL)"
+echo
+```
+
+### Token Analysis
+
+```bash
+#!/bin/bash
+# token_analysis.sh TOKEN_ADDRESS
+
+TOKEN=$1
+echo "=== Token Analysis: $TOKEN ==="
+
+# Get deployment info
+echo "Deployment Info:"
+cast call $FACTORY "tokenDeploymentInfo(address)((address,address,address,address[]))" $TOKEN --rpc-url $RPC_URL
+
+# Get token metadata
+echo -e "\nToken Metadata:"
+cast call $TOKEN "allData()(address,address,string,string,string)" --rpc-url $RPC_URL
+
+# Get reward info if available
+echo -e "\nReward Info:"
+cast call $LP_LOCKER "tokenRewards(address)" $TOKEN --rpc-url $RPC_URL
+```
+
+## Integration Examples
+
+### JavaScript Integration
+
+```javascript
+// Query system status
+async function getSystemStatus() {
+  const factory = new ethers.Contract(FACTORY, factoryABI, provider);
+  
+  return {
+    deprecated: await factory.deprecated(),
+    baseToken: await factory.baseToken(),
+    teamFeeRecipient: await factory.teamFeeRecipient(),
+    feyTotalSupply: await feyToken.totalSupply(),
+    factoryWethBalance: await weth.balanceOf(FACTORY),
+    factoryFeyBalance: await feyToken.balanceOf(FACTORY)
+  };
+}
+
+// Monitor fee claims
+factory.on('ClaimFees', (token, recipient, amount, event) => {
+  console.log(`Fee claimed: ${amount} of ${token} to ${recipient}`);
+});
+```
+
+### Python Integration
+
+```python
+from web3 import Web3
+
+# Setup
+w3 = Web3(Web3.HTTPProvider('https://mainnet.base.org'))
+factory = w3.eth.contract(address=FACTORY, abi=factory_abi)
+
+# Query functions
+def get_token_deployment_info(token_address):
+    return factory.functions.tokenDeploymentInfo(token_address).call()
+
+def check_available_fees(fee_owner, token):
+    fee_locker = w3.eth.contract(address=FEE_LOCKER, abi=fee_locker_abi)
+    return fee_locker.functions.availableFees(fee_owner, token).call()
+```
+
+## Common Use Cases
+
+### Monitor Protocol Revenue
+
+```bash
+# Track fee accumulation over time
+while true; do
+  echo "$(date): WETH Balance: $(cast call 0x4200000000000000000000000000000000000006 'balanceOf(address)(uint256)' $FACTORY --rpc-url $RPC_URL)"
+  sleep 300  # Check every 5 minutes
+done
+```
+
+### Verify Token Authenticity
+
+```bash
+# Check if a token was deployed through FEY
+TOKEN_ADDRESS="0x..."
+DEPLOYMENT_INFO=$(cast call $FACTORY "tokenDeploymentInfo(address)((address,address,address,address[]))" $TOKEN_ADDRESS --rpc-url $RPC_URL)
+
+if [[ $DEPLOYMENT_INFO == *"0x000000000000"* ]]; then
+  echo "Token not deployed through FEY"
+else
+  echo "Token deployed through FEY: $DEPLOYMENT_INFO"
+fi
+```
+
+### Check Reward Eligibility
+
+```bash
+# Check if you have claimable rewards
+MY_ADDRESS="0x..."
+FEY_REWARDS=$(cast call $FEE_LOCKER "availableFees(address,address)(uint256)" $MY_ADDRESS $FEY_TOKEN --rpc-url $RPC_URL)
+echo "Claimable FEY rewards: $FEY_REWARDS"
+```
+
+---
+
+## Related Documentation
+
+- **Contract Addresses**: [Reference →](/reference/addresses)
+- **Integration Guide**: [Developer Guides →](/guides/integration)  
+- **Troubleshooting**: [Support →](/support/troubleshooting)
+- **Contract Details**: [Core Contracts →](/contracts/factory)

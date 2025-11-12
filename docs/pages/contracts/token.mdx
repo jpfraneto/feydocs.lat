@@ -1,0 +1,347 @@
+# FEY Token Contract
+
+The FEY Token is the native token of the FEY Protocol, serving as the base pairing token for all deployments and the reward/governance token for the network.
+
+**Contract Address**: `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`
+
+## Overview
+
+FEY is an advanced ERC20 token with additional features for governance, cross-chain compatibility, and gasless transactions. It serves multiple roles within the FEY Protocol ecosystem.
+
+### Token Properties
+
+- **Name**: FEY
+- **Symbol**: FEY  
+- **Decimals**: 18
+- **Total Supply**: 100,000,000,000 FEY (100 billion tokens)
+- **Supply Model**: Fixed supply, no inflation
+
+### Key Features
+
+**🗳️ Governance Ready**: ERC20Votes implementation for future DAO functionality
+**🌉 Cross-Chain**: IERC7802 Superchain token bridge compatibility
+**⛽ Gasless Transactions**: ERC20Permit for meta-transactions
+**🔥 Burnable**: ERC20Burnable for potential deflationary mechanisms
+**🔐 Admin Controlled**: Updatable metadata and verification system
+
+## Core Functions
+
+### Standard ERC20
+
+The token implements full ERC20 functionality with standard functions:
+
+```solidity
+function transfer(address to, uint256 amount) external returns (bool)
+function transferFrom(address from, address to, uint256 amount) external returns (bool)
+function approve(address spender, uint256 amount) external returns (bool)
+function balanceOf(address account) external view returns (uint256)
+function totalSupply() external view returns (uint256)
+function allowance(address owner, address spender) external view returns (uint256)
+```
+
+### Governance Features (ERC20Votes)
+
+```solidity
+function delegate(address delegatee) external
+function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external
+function getCurrentVotes(address account) external view returns (uint256)
+function getPriorVotes(address account, uint256 blockNumber) external view returns (uint256)
+```
+
+**Governance Capabilities:**
+- **Vote Delegation**: Token holders can delegate voting power
+- **Historical Voting**: Query voting power at specific block numbers  
+- **Self-Delegation**: Holders must delegate to themselves to activate voting power
+- **Future DAO**: Foundation for potential governance implementation
+
+### Gasless Transactions (ERC20Permit)
+
+```solidity
+function permit(
+    address owner,
+    address spender,
+    uint256 value,
+    uint256 deadline,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+) external
+```
+
+**Benefits:**
+- **No ETH Required**: Users can approve without holding ETH
+- **Better UX**: Eliminates separate approval transactions
+- **Meta-Transaction Ready**: Supports gasless transaction patterns
+
+### Token Burning (ERC20Burnable)
+
+```solidity
+function burn(uint256 amount) public
+function burnFrom(address account, uint256 amount) public
+```
+
+**Use Cases:**
+- **Deflationary Mechanisms**: Potential future fee burning
+- **Supply Reduction**: Permanent token removal from circulation
+- **Holder Control**: Token holders can burn their own tokens
+
+## Metadata Management
+
+### Admin Functions
+
+```solidity
+function updateAdmin(address admin_) external
+function updateImage(string memory image_) external  
+function updateMetadata(string memory metadata_) external
+```
+
+**Admin Privileges:**
+- **Image Updates**: Change token logo/visual representation
+- **Metadata Updates**: Update JSON metadata
+- **Admin Transfer**: Transfer admin role to different address
+
+**Access Control:**
+- Only current admin can make changes
+- Admin role is transferable
+- Original admin retains verification rights
+
+### Token Information
+
+```solidity
+function admin() external view returns (address)
+function originalAdmin() external view returns (address)
+function imageUrl() external view returns (string memory)
+function metadata() external view returns (string memory)
+function context() external view returns (string memory)
+```
+
+**Data Retrieval:**
+- **Current Admin**: Active admin address
+- **Original Admin**: Immutable creator address  
+- **Image URL**: Token logo/image location
+- **Metadata**: JSON metadata URL
+- **Context**: Additional context information
+
+### Batch Data Access
+
+```solidity
+function allData() external view returns (
+    address originalAdmin,
+    address admin,
+    string memory image,
+    string memory metadata,
+    string memory context
+)
+```
+
+Convenience function for retrieving all token metadata in a single call.
+
+## Verification System
+
+### Token Verification
+
+```solidity
+function verify() external
+function isVerified() external view returns (bool)
+```
+
+**Verification Process:**
+- Only `originalAdmin` can verify the token
+- Verification is permanent (cannot be undone)
+- Provides authenticity guarantees for users
+
+**Benefits:**
+- **Authenticity**: Proves token is official
+- **Trust**: Users can verify legitimate tokens
+- **Permanence**: Cannot be revoked once set
+
+## Cross-Chain Functionality
+
+### Superchain Token Bridge (IERC7802)
+
+```solidity
+function crosschainMint(address _to, uint256 _amount) external
+function crosschainBurn(address _from, uint256 _amount) external
+```
+
+**Bridge Integration:**
+- **Authorized Minting**: Only Superchain Token Bridge can mint
+- **Burn on Transfer**: Tokens burned when bridging out
+- **Event Tracking**: Bridge events for monitoring
+
+**Cross-Chain Features:**
+- **Multi-Chain Deployment**: Same token across Superchain networks
+- **Unified Supply**: Total supply maintained across chains
+- **Native Bridge**: Built-in Optimism/Base bridge compatibility
+
+### Chain-Specific Minting
+
+During deployment, tokens are only minted on the originating chain:
+
+```solidity
+if (block.chainid == initialSupplyChainId_) {
+    _mint(msg.sender, maxSupply_);
+}
+```
+
+**Supply Distribution:**
+- **Originating Chain**: Full 100B supply minted
+- **Other Chains**: Zero initial supply
+- **Bridge Transfers**: Supply moves via burn/mint
+
+## Technical Implementation
+
+### Interface Support
+
+```solidity
+function supportsInterface(bytes4 _interfaceId) public pure returns (bool)
+```
+
+**Supported Interfaces:**
+- **IERC20**: Standard ERC20 functionality
+- **IERC7802**: Superchain token bridge
+- **IERC165**: Interface detection
+- **IERC5805**: Governance (ERC20Votes)
+
+### Security Features
+
+**Reentrancy Protection:**
+- Critical functions use `nonReentrant` modifier
+- Prevents reentrancy attacks during transfers
+
+**Access Control:**
+- Admin functions restricted to current admin
+- Verification restricted to original admin
+- Bridge functions restricted to authorized bridge
+
+## Events
+
+### Administrative Events
+
+```solidity
+event UpdateAdmin(address indexed oldAdmin, address indexed newAdmin);
+event UpdateImage(string image);
+event UpdateMetadata(string metadata);
+event Verified(address indexed admin, address indexed token);
+```
+
+### Cross-Chain Events
+
+```solidity
+event CrosschainMint(address indexed _to, uint256 _amount, address indexed _sender);
+event CrosschainBurn(address indexed _from, uint256 _amount, address indexed _sender);
+```
+
+## Usage Examples
+
+### Check Token Information
+
+```javascript
+// Get basic token info
+const name = await feyToken.name();
+const symbol = await feyToken.symbol();
+const totalSupply = await feyToken.totalSupply();
+const decimals = await feyToken.decimals();
+
+console.log(`${name} (${symbol})`);
+console.log(`Total Supply: ${totalSupply.toString()}`);
+console.log(`Decimals: ${decimals}`);
+```
+
+### Query Metadata
+
+```javascript
+// Get all metadata at once
+const [originalAdmin, admin, image, metadata, context] = await feyToken.allData();
+
+console.log("Original Admin:", originalAdmin);
+console.log("Current Admin:", admin);
+console.log("Image URL:", image);
+console.log("Metadata:", metadata);
+console.log("Context:", context);
+```
+
+### Check Verification Status
+
+```javascript
+// Verify token authenticity
+const isVerified = await feyToken.isVerified();
+const originalAdmin = await feyToken.originalAdmin();
+
+console.log("Token verified:", isVerified);
+console.log("Original creator:", originalAdmin);
+```
+
+### Monitor Admin Changes
+
+```javascript
+// Listen for admin updates
+feyToken.on("UpdateAdmin", (oldAdmin, newAdmin, event) => {
+  console.log(`Admin changed from ${oldAdmin} to ${newAdmin}`);
+});
+
+// Listen for metadata updates
+feyToken.on("UpdateImage", (image, event) => {
+  console.log(`Token image updated: ${image}`);
+});
+```
+
+### Gasless Approvals
+
+```javascript
+// Create permit signature for gasless approval
+const permit = await createPermitSignature(
+  feyToken,
+  owner,
+  spender,
+  amount,
+  deadline
+);
+
+// Submit permit transaction (can be done by anyone)
+await feyToken.permit(
+  owner,
+  spender,
+  amount,
+  deadline,
+  permit.v,
+  permit.r,
+  permit.s
+);
+```
+
+## Integration Notes
+
+### For DeFi Protocols
+
+**Token Integration:**
+- Standard ERC20 compatibility
+- Fixed supply (no inflation risk)
+- Burnable (deflationary potential)
+- Governance ready (future voting)
+
+**Metadata Handling:**
+- Dynamic image and metadata URLs
+- Verification status for authenticity
+- Admin-controlled updates
+
+### For Cross-Chain Applications
+
+**Bridge Integration:**
+- Native Superchain bridge support
+- Automatic burn/mint mechanics
+- Cross-chain supply tracking
+
+**Multi-Chain Support:**
+- Same contract deployed across chains
+- Unified token identity
+- Seamless transfers
+
+---
+
+## Related Documentation
+
+- **Tokenomics**: [Token Mechanics →](/architecture/tokenomics)
+- **Staking**: [Fee Distribution →](/architecture/fees)
+- **Usage**: [Getting Started →](/getting-started)
+- **Contract Addresses**: [Reference →](/reference/addresses)

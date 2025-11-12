@@ -1,0 +1,4300 @@
+# FEY Protocol
+
+> The first fully permissionless, user-owned launchpad
+
+## Key Concepts
+
+Understanding these core concepts will help you grasp how FEY Protocol creates a self-sustaining, user-owned launchpad network.
+
+### Permissionless Ownership
+
+Traditional launchpads are **permissioned** - the company controls fee distribution, can change revenue sharing, and owns all decision-making power. FEY is **permissionless** - all core operations happen automatically through smart contracts without any central control.
+
+:::info[True Ownership]
+When you hold $FEY, you own part of the protocol infrastructure itself. This is similar to holding BTC (ownership in Bitcoin network) or ETH (ownership in Ethereum network), not just utility tokens.
+:::
+
+### Fee Distribution Model
+
+#### How Fees Flow
+
+```mermaid
+graph TD
+    A[User Trades] --> B[LP Fees Generated]
+    B --> C[80% to Liquidity Providers]
+    B --> D[20% to Protocol]
+    D --> E[Collected in Paired Token]
+    E --> F{Token Type}
+    F -->|WETH| G[Factory → teamFeeRecipient]
+    F -->|FEY| H[Factory → Fee Locker]
+    H --> I[Stakers Claim Individually]
+    G --> J[Manual Buyback → Staking Contract]
+```
+
+#### Automatic Distribution
+
+* **LP Fees**: Standard Uniswap V4 fees go to liquidity providers (80%)
+* **Protocol Fees**: 20% of LP fees automatically route to the protocol
+* **Collection**: Fees collected in the paired token (FEY or WETH)
+* **Distribution**: 100% flows back to stakers through permissionless contracts
+
+### TOKEN/FEY Pairing Model
+
+#### Why FEY Pairs?
+
+All tokens deployed on FEY pair with $FEY rather than ETH or stablecoins. This creates:
+
+* **Buy Pressure**: Every trade creates demand for $FEY
+* **Network Effects**: As more tokens launch, $FEY becomes more valuable
+* **Creator Alignment**: Token creators earn rewards in $FEY, aligning them with protocol success
+
+#### Bootstrap Exception
+
+The $FEY token itself pairs with WETH to provide the base liquidity for the entire system. This WETH/FEY pool is the only exception to the FEY-pairing rule.
+
+### Staking & Reward Mechanics
+
+#### Staking Benefits
+
+When you stake $FEY, you receive:
+
+* **Protocol Fees**: From all trading activity across the network
+* **LP Rewards**: From liquidity positions managed by the protocol
+* **Buyback Distribution**: From automatic WETH→FEY conversions
+
+#### Early Participant Advantage
+
+Since staking rewards are distributed proportionally, early stakers receive higher relative rewards because:
+
+* Fewer total stakers = larger share of fees
+* Growing network activity = increasing absolute rewards
+* Fixed token supply = no dilution from new issuance
+
+### Creator Rewards System
+
+#### How Creators Earn
+
+Token creators receive rewards through multiple mechanisms:
+
+1. **Direct Creator Fees**: 1% of trading volume in their token
+2. **LP Position Rewards**: Fees from protocol-managed liquidity positions
+3. **Network Participation**: All rewards paid in $FEY, giving creators exposure to network growth
+
+#### Success Alignment
+
+This model aligns creator success with network success:
+
+* Successful tokens generate more trading volume
+* More volume = more $FEY rewards for creators
+* Creators become $FEY stakeholders, incentivized to promote the network
+
+### Automatic Buyback Mechanism
+
+#### WETH → FEY Conversion
+
+The protocol implements automatic buybacks:
+
+1. **WETH Accumulation**: Factory receives WETH fees from FEY/WETH pool
+2. **Public Triggers**: Anyone can call `claimWethFees()` to release accumulated WETH
+3. **Manual Buyback**: WETH goes to `teamFeeRecipient` who performs market buyback
+4. **Distribution**: Purchased $FEY flows to staking contract for distribution
+
+:::warning[Manual Step]
+The buyback mechanism currently includes one manual step where `teamFeeRecipient` performs the actual WETH→FEY swap. This will be automated in future protocol upgrades.
+:::
+
+### MEV Protection
+
+#### Fair Launch Protection
+
+New token pools receive MEV protection during launch:
+
+* **Time Window**: 2-minute maximum protection period
+* **Fee Adjustment**: MEV module can increase fees up to 80% to deter MEV
+* **Auto-Disable**: Protection automatically expires or can be disabled by the module
+* **Liquidity Block**: No liquidity changes allowed during protection window
+
+#### No-Op Default
+
+The current MEV module is a "no-op" that immediately disables itself, serving as a template for future MEV protection implementations.
+
+### Extension System
+
+#### Modular Functionality
+
+FEY uses an extension system to add functionality:
+
+* **Dev Buy Extensions**: Allow ETH purchases during token deployment
+* **Future Extensions**: Airdrops, vesting, presales, etc.
+* **Permissioned Extensions**: Must be approved through allowlist contract
+* **Composable**: Multiple extensions can be used in single deployment
+
+#### Current Extensions
+
+**FeyUniv4EthDevBuy** (`0x173077c319c38bb08D4C4968014357fd518446b4`)
+
+* Enables ETH-based token purchases during deployment
+* Automatically swaps ETH → WETH → FEY → new token
+* Pure buy mechanism (no token allocation to extension)
+
+### Network Economics
+
+#### Fixed Supply Model
+
+* **Total Supply**: 100,000,000,000 $FEY (100B tokens)
+* **No Inflation**: Fixed supply, no new issuance
+* **Deflationary Pressure**: Automatic buybacks reduce circulating supply
+* **Value Accrual**: All network growth benefits existing holders
+
+#### Self-Sustaining Loop
+
+1. More tokens deploy on FEY → More trading volume
+2. More volume → More protocol fees → More rewards for stakers
+3. Higher staking rewards → More demand for $FEY
+4. Higher $FEY price → Better creator rewards → Attracts more creators
+5. Loop repeats, creating network effects
+
+***
+
+### Next Steps
+
+Now that you understand the key concepts:
+
+* **Start using FEY**: [Getting Started →](/getting-started)
+* **Deep dive into architecture**: [Protocol Overview →](/architecture/overview)
+* **Learn about tokenomics**: [Token Mechanics →](/architecture/tokenomics)
+* **Explore the contracts**: [Core Contracts →](/contracts/factory)
+
+
+## Example
+
+This is an example page.
+
+
+## Frequently Asked Questions
+
+Common questions about FEY Protocol, how it works, and how to participate.
+
+### General Questions
+
+#### What is FEY Protocol?
+
+FEY Protocol is the first fully permissionless, user-owned launchpad built on Base. Unlike traditional launchpads owned by corporations, FEY operates as decentralized public infrastructure where users gain real ownership through staking $FEY tokens.
+
+**Key Differences:**
+
+* 100% of protocol fees redistribute to token stakers
+* No governance required for core operations
+* Users own the infrastructure they use
+* All operations are permissionless and automatic
+
+#### How is FEY different from Pump.fun?
+
+While Pump.fun pioneered fair-launch mechanics, it remains a privately-owned corporation:
+
+| Feature              | Pump.fun                  | FEY Protocol             |
+| -------------------- | ------------------------- | ------------------------ |
+| **Ownership**        | Corporate shareholders    | Token stakers (users)    |
+| **Fee Distribution** | To company treasury       | 100% to stakers          |
+| **Revenue Sharing**  | At company discretion     | Automatic & permanent    |
+| **Buybacks**         | Optional company decision | Automatic & public       |
+| **Control**          | Centralized team          | Permissionless contracts |
+
+#### What does "permissionless" mean?
+
+Permissionless means that core protocol operations happen automatically through smart contracts without requiring approval from any central authority:
+
+* Fee distribution is automatic
+* Buybacks are triggered by public functions
+* No governance votes needed for basic operations
+* Anyone can call maintenance functions
+
+### Token Economics
+
+#### How does the $FEY token work?
+
+$FEY serves multiple roles in the ecosystem:
+
+**Base Pairing Token**: All deployed tokens pair with $FEY (not ETH)
+**Staking Token**: Stake $FEY to earn protocol fees
+**Reward Token**: Token creators earn fees in $FEY
+**Governance Token**: Future DAO functionality (not yet active)
+
+**Key Properties:**
+
+* Fixed supply: 100,000,000,000 $FEY (100B tokens)
+* No inflation: No new tokens ever created
+* Burnable: Tokens can be permanently removed
+* Cross-chain: Compatible with Superchain bridges
+
+#### How do staking rewards work?
+
+When you stake $FEY, you earn from multiple revenue streams:
+
+**Protocol Fees**: 20% of all LP fees from every pool
+**LP Rewards**: Fees from protocol-managed liquidity positions\
+**Buyback Distribution**: $FEY purchased from automatic WETH conversion
+
+**Distribution Mechanism:**
+
+1. Fees accumulate in the Fee Locker contract
+2. Stakers can claim their share anytime
+3. Rewards are proportional to staked amount
+4. Early stakers get higher relative rewards
+
+:::info[Staking is Live!]
+Staking is now active! You can stake your $FEY tokens directly on [fey.money](https://fey.money), interact with the smart contract at `0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50` by calling the `deposit` function, or use the Farcaster miniapp by [@jpfraneto.eth](https://farcaster.xyz/jpfraneto.eth) at [this link](https://farcaster.xyz/jpfraneto.eth/0xcc27e5ac).
+:::
+
+#### What creates buy pressure for $FEY?
+
+Several mechanisms create consistent demand:
+
+**Trading Volume**: Every token pairs with $FEY, so all trades involve $FEY
+**Creator Rewards**: Token creators earn fees in $FEY, becoming stakeholders
+**Automatic Buybacks**: WETH fees are converted to $FEY and distributed
+**Staking Demand**: Users need $FEY to earn protocol fees
+
+### Using the Protocol
+
+#### How do I deploy a token on FEY?
+
+Token deployment involves several steps:
+
+1. **Prepare Configuration**: Token metadata, liquidity settings, reward splits
+2. **Deploy via Factory**: Call `deployToken()` with your configuration
+3. **Include Extensions**: Add ETH for dev buy or other extensions
+4. **Automatic Setup**: Protocol handles pool creation, liquidity, and MEV protection
+
+See our detailed [Token Deployment Guide →](/flows/deployment) for complete instructions.
+
+#### What are extensions?
+
+Extensions add functionality to token deployments:
+
+**FeyUniv4EthDevBuy**: Purchase tokens with ETH during deployment
+**Future Extensions**: Presales, airdrops, vesting, team allocations
+
+Extensions must be approved through the allowlist contract and can be combined in a single deployment.
+
+#### How do creator rewards work?
+
+Token creators earn multiple types of rewards:
+
+**Creator Fees**: 1% of trading volume in their token
+**LP Position Rewards**: Fees from protocol-managed liquidity
+**Network Growth**: All rewards paid in $FEY, so creators benefit from network success
+
+**Reward Flow:**
+
+1. Trading generates LP fees
+2. Creator's share flows to LP Locker
+3. LP Locker distributes to configured recipients
+4. Recipients can claim from Fee Locker
+
+#### Can I stake $FEY now?
+
+Yes! Staking is now live and you have several options:
+
+**Web Interface**: Visit [fey.money](https://fey.money) for the easiest staking experience
+
+**Farcaster Miniapp**: Use the miniapp by [@jpfraneto.eth](https://farcaster.xyz/jpfraneto.eth) at [this link](https://farcaster.xyz/jpfraneto.eth/0xcc27e5ac)
+
+**Direct Contract Interaction**: Call the `deposit` function on the staking contract at `0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50`
+
+**Staking Benefits**:
+
+* Earn fees from all protocol activity
+* Proportional rewards based on your staked amount
+* Claim rewards through the Fee Locker anytime
+
+### Technical Questions
+
+#### What blockchain is FEY on?
+
+FEY Protocol is deployed on **Base Mainnet** (Chain ID: 8453).
+
+**Why Base?**
+
+* Lower transaction costs than Ethereum
+* Fast block times and finality
+* Growing DeFi ecosystem
+* Superchain compatibility for future expansion
+
+#### What is Uniswap V4 and why does FEY use it?
+
+Uniswap V4 is the latest version of the Uniswap protocol with advanced features:
+
+**Hooks System**: Custom logic for pools (FEY uses this for fee management)
+**Dynamic Fees**: Fees can change based on market conditions
+**Gas Efficiency**: Lower costs for swaps and liquidity operations
+**Singleton Architecture**: All pools share one contract
+
+FEY's hook integrates deeply with V4 to provide:
+
+* Automatic fee collection
+* Dynamic fee adjustment
+* MEV protection
+* Extension system integration
+
+#### How does MEV protection work?
+
+New token pools receive MEV protection during their first 2 minutes:
+
+**Protection Features:**
+
+* MEV module can increase fees up to 80% to deter MEV bots
+* No liquidity changes allowed during protection window
+* Automatically expires after 2 minutes
+
+**Current Implementation:**
+
+* Uses a "no-op" module that immediately disables itself
+* Serves as template for future MEV protection strategies
+* Can be upgraded to more sophisticated protection
+
+#### Are the contracts audited?
+
+Contract audit status:
+
+* **Smart Contract Review**: Internal security review completed
+* **External Audit**: In progress with reputable auditing firm
+* **Bug Bounty**: Community bug bounty program planned
+
+**Security Features:**
+
+* Multiple access controls and permission systems
+* Freeze mechanisms for critical parameters
+* Capped fees and MEV protection limits
+* Reentrancy protection on critical functions
+
+#### How can I verify contract authenticity?
+
+All contracts are verified on BaseScan:
+
+1. **Check Addresses**: Use our [official address list →](/reference/addresses)
+2. **Verify Source Code**: All contracts have verified source on BaseScan
+3. **Token Verification**: Official $FEY token has verification status
+4. **Social Verification**: Follow [@feyprotocol](https://twitter.com/feyprotocol) for official announcements
+
+### Troubleshooting
+
+#### Why can't I deploy a token?
+
+Common issues and solutions:
+
+**Factory Deprecated**: Factory may be temporarily disabled
+
+* *Solution*: Wait for reactivation or check if you need bootstrap access
+
+**Base Token Not Set**: Protocol not fully initialized
+
+* *Solution*: Wait for protocol bootstrap completion
+
+**Extension Not Enabled**: Extension not approved in allowlist
+
+* *Solution*: Contact team to add extension to allowlist
+
+**Configuration Errors**: Invalid deployment configuration
+
+* *Solution*: Check that all arrays have matching lengths and reward BPS sum to 10,000
+
+#### Where are my creator rewards?
+
+Rewards flow through several contracts:
+
+1. **Check LP Locker**: Ensure `collectRewards()` is being called for your token
+2. **Check Fee Locker**: Query `availableFees()` for your address
+3. **Claim Rewards**: Call `claim()` function to withdraw available fees
+
+Use our [Cast commands →](/guides/cast-commands) to check reward status.
+
+#### Why isn't my extension working?
+
+Extension troubleshooting:
+
+1. **Check Allowlist**: Verify extension is enabled in allowlist contract
+2. **Check Pool Configuration**: Ensure extension is properly registered
+3. **Check Extension Data**: Verify extension data is correctly encoded
+4. **Check ETH Amount**: Ensure sufficient ETH sent for extension
+
+#### How do I get support?
+
+**Community Support:**
+
+* Discord: [Join our community](https://discord.gg/feyprotocol)
+* Twitter: [@feyprotocol](https://twitter.com/feyprotocol)
+* GitHub: [Issues and discussions](https://github.com/feyprotocol)
+
+**Documentation:**
+
+* [Troubleshooting Guide →](/support/troubleshooting)
+* [Developer Guides →](/guides/integration)
+* [Contract Documentation →](/contracts/factory)
+
+**For Emergencies:**
+
+* Security issues: [security@feyprotocol.xyz](mailto\:security@feyprotocol.xyz)
+* Critical bugs: Please report responsibly through proper channels
+
+***
+
+### Still have questions?
+
+If you didn't find what you're looking for:
+
+* **Check our guides**: [Getting Started →](/getting-started)
+* **Read the docs**: [Architecture Overview →](/architecture/overview)
+* **Join the community**: [Discord](https://discord.gg/feyprotocol)
+* **Follow updates**: [@feyprotocol](https://twitter.com/feyprotocol)
+
+
+## Getting Started
+
+This guide will help you start using FEY Protocol, whether you want to stake $FEY, deploy a token, or integrate with the protocol.
+
+### Quick Overview
+
+FEY Protocol is live on **Base Mainnet** with these core contracts:
+
+* **Factory**: `0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d`
+* **FEY Token**: `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`
+* **Main Pool**: FEY/WETH on Uniswap V4
+
+### For Token Stakers
+
+#### 1. Get $FEY Tokens
+
+$FEY tokens are available on Uniswap V4 (FEY/WETH pool):
+
+* **Pool ID**: `0xe155c517c53f078f4b443c99436e42c1b80fd2fb1b3508f431c46b8365e4f3f0`
+* **Token Contract**: `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`
+
+:::info[Trading]
+You can trade $FEY on any Uniswap V4 compatible interface. Make sure you're on Base mainnet.
+:::
+
+#### 2. Stake Your $FEY
+
+:::warning[Staking Contract Coming]
+The staking contract is still being finalized. For now, hold $FEY tokens in your wallet. Staking will be enabled in a future protocol update.
+:::
+
+Staking will provide:
+
+* Protocol fees from all network activity
+* LP rewards from managed positions
+* Buyback distributions from WETH conversions
+
+#### 3. Monitor Your Rewards
+
+Once staking is live, you can:
+
+* Check rewards through the Fee Locker contract
+* Claim accumulated fees manually
+* View real-time protocol activity
+
+### For Token Creators
+
+#### 1. Prepare Your Token Metadata
+
+Before deploying, prepare:
+
+* **Name**: Your token name
+* **Symbol**: Token symbol (keep it short)
+* **Image**: Token logo/image URL
+* **Metadata**: JSON metadata URL
+* **Context**: Additional context string
+
+#### 2. Configure Your Deployment
+
+Token deployments require several configuration parameters:
+
+```typescript
+interface DeploymentConfig {
+  tokenConfig: {
+    name: string;
+    symbol: string;
+    image: string;
+    metadata: string;
+    context: string;
+    tokenAdmin: address;
+    salt: uint256;
+    originatingChainId: uint256;
+  };
+  poolConfig: {
+    hook: address; // Use FEY Hook
+    pairedToken: address; // Will be overridden to FEY
+    tickIfToken0IsFey: int24;
+    tickSpacing: int24;
+    poolData: bytes;
+  };
+  lockerConfig: {
+    locker: address;
+    tickLower: int24[];
+    tickUpper: int24[];
+    positionBps: uint16[];
+    rewardBps: uint16[];
+    rewardAdmins: address[];
+    rewardRecipients: address[];
+  };
+  // ... additional configs
+}
+```
+
+#### 3. Deploy Your Token
+
+Call the Factory contract:
+
+```solidity
+function deployToken(DeploymentConfig memory config) 
+  external payable returns (address tokenAddress);
+```
+
+:::tip[Dev Buy]
+Include ETH with your deployment to automatically purchase your tokens through the dev buy extension.
+:::
+
+#### 4. Earn Creator Rewards
+
+After deployment:
+
+* Earn 1% of trading volume in $FEY
+* Receive LP rewards from protocol positions
+* Stake earned $FEY to compound returns
+
+### For Developers
+
+#### 1. Contract Integration
+
+Key contracts for integration:
+
+```typescript
+const contracts = {
+  factory: "0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d",
+  feyToken: "0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D",
+  hook: "0x5B409184204b86f708d3aeBb3cad3F02835f68cC",
+  feeLocker: "0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6",
+  lpLocker: "0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa",
+};
+```
+
+#### 2. Query Protocol State
+
+Use cast or web3 libraries to query state:
+
+```bash
+# Check FEY total supply
+cast call 0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D \
+  "totalSupply()(uint256)" --rpc-url https://mainnet.base.org
+
+# Get token deployment info
+cast call 0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d \
+  "tokenDeploymentInfo(address)" [TOKEN_ADDRESS] \
+  --rpc-url https://mainnet.base.org
+```
+
+#### 3. Build Extensions
+
+To build protocol extensions:
+
+1. **Implement IFeyExtension interface**
+2. **Get extension approved** in the allowlist contract
+3. **Test integration** with deployment flow
+
+See [Building Extensions →](/guides/extensions) for detailed instructions.
+
+#### 4. Monitor Protocol Activity
+
+Track protocol events:
+
+* `TokenCreated`: New token deployments
+* `ClaimFees`: Fee distributions
+* `ExtensionTriggered`: Extension usage
+
+### Network Information
+
+#### Base Mainnet Details
+
+* **Chain ID**: 8453
+* **RPC**: `https://mainnet.base.org`
+* **Explorer**: [BaseScan](https://basescan.org)
+
+#### Key Addresses
+
+| Contract   | Address                                      |
+| ---------- | -------------------------------------------- |
+| Factory    | `0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d` |
+| FEY Token  | `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D` |
+| Hook       | `0x5B409184204b86f708d3aeBb3cad3F02835f68cC` |
+| Fee Locker | `0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6` |
+| LP Locker  | `0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa` |
+
+[View complete address list →](/reference/addresses)
+
+### Support & Resources
+
+#### Documentation
+
+* **Architecture**: [Protocol Overview →](/architecture/overview)
+* **Contracts**: [Core Contracts →](/contracts/factory)
+* **Flows**: [Token Deployment →](/flows/deployment)
+
+#### Community
+
+* **GitHub**: [https://github.com/feyprotocol](https://github.com/feyprotocol)
+* **Discord**: [Join community](https://discord.gg/feyprotocol)
+* **Twitter**: [@feyprotocol](https://twitter.com/feyprotocol)
+
+#### Help
+
+* **Troubleshooting**: [Common Issues →](/support/troubleshooting)
+* **Security**: [Security Guide →](/support/security)
+* **FAQ**: [Frequently Asked Questions →](/faq)
+
+***
+
+Ready to dive deeper? Explore the [Protocol Architecture →](/architecture/overview) or check out specific [Contract Documentation →](/contracts/factory).
+
+
+## What is FEY Protocol?
+
+FEY Protocol is the first fully permissionless, user-owned launchpad built on Base. Unlike traditional launchpads owned by corporations, FEY operates as decentralized public infrastructure where users gain real ownership through staking.
+
+### The Vision
+
+*"Everything will be tokenized"* - this has been a thesis in crypto for years. Pumpfun proved this out as the first successful fair-launch platform, becoming one of the most profitable onchain experiments ever, reaching $750M revenue faster than any other protocol.
+
+However, all existing launchpads share a fundamental problem: **they are privately-owned corporations**. While built on crypto rails for crypto participants, their structure and ownership remain from the old world.
+
+FEY changes this by creating the first **user-owned launchpad network** where:
+
+* 100% of protocol fees redistribute to token holders
+* Operations are completely permissionless
+* Users get real ownership, not just utility tokens
+* The network is self-sustaining without external capital
+
+### How FEY Works
+
+#### Core Mechanics
+
+**🔄 Automatic Fee Distribution**
+
+* 20% of all LP fees flow to the protocol
+* Fees are collected in the paired token (FEY for most pools, WETH for the base pool)
+* 100% redistribution to stakers through permissionless contracts
+
+**💎 TOKEN/FEY Pairing**
+
+* All deployed tokens pair with $FEY (similar to Zora's model)
+* Creates constant buy pressure on $FEY from every trade
+* Token creators earn rewards in $FEY, aligning them with network growth
+
+**⚡ Permissionless Buybacks**
+
+* WETH fees trigger automatic $FEY buybacks
+* Anyone can call the buyback function (typically every 60 seconds)
+* Purchased $FEY is distributed to active stakers
+
+**🛡️ MEV Protection**
+
+* New pools get 2-minute MEV protection window
+* Prevents sniping during fair launches
+* Automatically disables to allow normal trading
+
+#### Network Participants
+
+**Token Creators**
+
+* Deploy tokens on FEY and earn creator rewards
+* Receive 1% of trading fees in $FEY
+* Gain exposure to network growth through $FEY holdings
+
+**Stakers**
+
+* Stake $FEY to receive protocol fee distributions
+* Earn from all trading activity across the network
+* True ownership stake in launchpad infrastructure
+
+**Traders**
+
+* Access to fair-launch tokens with MEV protection
+* Trade on Uniswap V4 with dynamic fee optimization
+* Benefit from deep liquidity provided by the protocol
+
+### Key Differences from Other Launchpads
+
+| Feature              | Traditional Launchpads    | FEY Protocol              |
+| -------------------- | ------------------------- | ------------------------- |
+| **Ownership**        | Corporate shareholders    | Token stakers (users)     |
+| **Fee Distribution** | To company treasury       | 100% to stakers           |
+| **Revenue Sharing**  | At company discretion     | Automatic & permanent     |
+| **Governance**       | Centralized decisions     | Permissionless operations |
+| **Creator Rewards**  | Fiat or company tokens    | Network token ($FEY)      |
+| **Buybacks**         | Optional company decision | Automatic & public        |
+
+### Why This Matters
+
+FEY represents a return to crypto's founding principles:
+
+* **Self-sovereignty**: Users own the infrastructure they use
+* **Permissionless**: No central authority controls operations
+* **Aligned incentives**: All participants benefit from network growth
+* **Public goods**: Infrastructure owned by its users, not corporations
+
+When you participate in FEY, you're not just using a launchpad - you're becoming a co-owner of the network itself.
+
+### Getting Started
+
+Ready to explore FEY Protocol?
+
+* **Learn the concepts**: [Key Concepts →](/concepts)
+* **Start using**: [Getting Started Guide →](/getting-started)
+* **Deep dive**: [Protocol Architecture →](/architecture/overview)
+* **For developers**: [Integration Guide →](/guides/integration)
+
+***
+
+*FEY Protocol: Where users own the rails they trade on.*
+
+
+## Admin
+
+This page covers administrative functions and procedures.
+
+### Coming Soon
+
+Detailed admin documentation will be available here.
+
+
+## Security
+
+This page covers security considerations and best practices for the Fey protocol.
+
+### Coming Soon
+
+Detailed security documentation will be available here.
+
+
+## Troubleshooting
+
+Common issues and solutions when working with FEY Protocol.
+
+### Deployment Issues
+
+#### Factory Deprecated Error
+
+**Problem**: Getting "Deprecated" error when trying to deploy tokens.
+
+**Cause**: The factory is temporarily disabled for new deployments.
+
+**Solutions**:
+
+1. **Check factory status**:
+   ```bash
+   cast call $FACTORY "deprecated()(bool)" --rpc-url https://mainnet.base.org
+   ```
+
+2. **Wait for reactivation**: Factory may be temporarily disabled for upgrades
+
+3. **Bootstrap access**: If you have bootstrap permissions, you can still deploy
+
+4. **Check announcements**: Follow [@feyprotocol](https://twitter.com/feyprotocol) for status updates
+
+#### Base Token Not Set
+
+**Problem**: Getting "BaseTokenNotSet" error.
+
+**Cause**: Protocol hasn't completed initial bootstrap process.
+
+**Diagnosis**:
+
+```bash
+# Check if base token is set
+cast call $FACTORY "baseToken()(address)" --rpc-url https://mainnet.base.org
+
+# Should return FEY token address: 0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D
+# If it returns 0x000...000, protocol isn't ready
+```
+
+**Solution**: Wait for protocol bootstrap completion or contact team.
+
+#### Invalid Reward Configuration
+
+**Problem**: Deployment reverts with reward-related errors.
+
+**Common Causes**:
+
+1. **Reward BPS don't sum to 10000**:
+   ```typescript
+   // ❌ Wrong - sums to 9000
+   rewardBps: [5000, 4000]
+
+   // ✅ Correct - sums to 10000  
+   rewardBps: [6000, 4000]
+   ```
+
+2. **Array length mismatch**:
+   ```typescript
+   // ❌ Wrong - different lengths
+   rewardBps: [5000, 5000],
+   rewardAdmins: ["0x1234"],  // Only 1 element
+   rewardRecipients: ["0x1234", "0x5678"]  // 2 elements
+
+   // ✅ Correct - matching lengths
+   rewardBps: [5000, 5000],
+   rewardAdmins: ["0x1234", "0x5678"],
+   rewardRecipients: ["0x1234", "0x5678"]
+   ```
+
+3. **Position BPS don't sum to 10000**:
+   ```typescript
+   // ❌ Wrong
+   positionBps: [5000, 3000]  // Only 8000
+
+   // ✅ Correct
+   positionBps: [7000, 3000]  // Equals 10000
+   ```
+
+#### Extension Configuration Errors
+
+**Problem**: Extension-related deployment failures.
+
+**Diagnostics**:
+
+```bash
+# Check if extension is enabled
+cast call 0xFD549237CdEAbDc14438CAF3f3861e174fDEae46 \
+  "enabledExtensions(address)(bool)" [EXTENSION_ADDRESS] \
+  --rpc-url https://mainnet.base.org
+
+# Check dev buy extension specifically
+cast call 0xFD549237CdEAbDc14438CAF3f3861e174fDEae46 \
+  "enabledExtensions(address)(bool)" 0x173077c319c38bb08D4C4968014357fd518446b4 \
+  --rpc-url https://mainnet.base.org
+```
+
+**Common Fixes**:
+
+1. **Extension not enabled**: Contact team to add extension to allowlist
+
+2. **Invalid extension data**: Check data encoding:
+   ```typescript
+   // For dev buy extension
+   const extensionData = ethers.AbiCoder.defaultAbiCoder().encode(
+     ['address', 'tuple(address,address,uint24,int24,address)', 'uint128'],
+     [recipient, poolKey, minAmountOut]
+   );
+   ```
+
+3. **ETH amount mismatch**:
+   ```typescript
+   // Ensure ETH sent matches extension configs
+   const totalEth = extensionConfigs.reduce(
+     (sum, ext) => sum + BigInt(ext.msgValue),
+     0n
+   );
+
+   // Send exactly this amount with deployment
+   await factory.deployToken(config, { value: totalEth });
+   ```
+
+#### MEV Module Issues
+
+**Problem**: MEV module related errors during deployment.
+
+**Diagnostics**:
+
+```bash
+# Check if MEV module is enabled
+cast call $FACTORY "enabledMevModules(address)(bool)" \
+  0x2ebc0fA629b268dFA3d455b67027d507a562EAC0 \
+  --rpc-url https://mainnet.base.org
+```
+
+**Solutions**:
+
+1. Use the standard no-op MEV module: `0x2ebc0fA629b268dFA3d455b67027d507a562EAC0`
+2. Ensure MEV module data is properly encoded
+3. Contact team if you need custom MEV protection
+
+### Fee and Reward Issues
+
+#### No Rewards Appearing
+
+**Problem**: Not receiving expected creator or staking rewards.
+
+**Diagnosis Steps**:
+
+1. **Check token reward configuration**:
+   ```bash
+   cast call $LP_LOCKER "tokenRewards(address)" [TOKEN_ADDRESS] --rpc-url https://mainnet.base.org
+   ```
+
+2. **Check if rewards collection is being triggered**:
+   ```bash
+   # Anyone can trigger this
+   cast send $LP_LOCKER "collectRewards(address)" [TOKEN_ADDRESS] \
+     --private-key $PRIVATE_KEY --rpc-url https://mainnet.base.org
+   ```
+
+3. **Check your available fees**:
+   ```bash
+   cast call $FEE_LOCKER \
+     "availableFees(address,address)(uint256)" \
+     [YOUR_ADDRESS] [TOKEN_ADDRESS] \
+     --rpc-url https://mainnet.base.org
+   ```
+
+**Common Causes**:
+
+* Rewards collection not being called regularly
+* Low trading volume (no fees generated)
+* Incorrect recipient address in deployment config
+
+#### Fee Claims Failing
+
+**Problem**: Cannot claim fees from Fee Locker.
+
+**Diagnosis**:
+
+```bash
+# Check if you have fees to claim
+cast call $FEE_LOCKER \
+  "availableFees(address,address)(uint256)" \
+  [YOUR_ADDRESS] [TOKEN_ADDRESS] \
+  --rpc-url https://mainnet.base.org
+
+# Check if address is authorized (for vault claims)
+cast call $FEE_LOCKER "vault()(address)" --rpc-url https://mainnet.base.org
+```
+
+**Solutions**:
+
+1. **No fees available**: Wait for more trading activity or rewards distribution
+2. **Vault restrictions**: If claiming for vault address, must call from vault itself
+3. **Wrong token**: Ensure you're checking the correct token address
+
+#### Protocol Fees Not Accumulating
+
+**Problem**: Expected protocol fees not reaching team recipient.
+
+**Diagnosis Flow**:
+
+1. **Check hook fee extraction**:
+   ```bash
+   # Verify hook is properly configured
+   cast call $HOOK "protocolFee()(uint24)" --rpc-url https://mainnet.base.org
+   ```
+
+2. **Check factory balances**:
+   ```bash
+   # Factory should accumulate fees temporarily
+   cast call $FEY_TOKEN "balanceOf(address)(uint256)" $FACTORY --rpc-url https://mainnet.base.org
+   cast call 0x4200000000000000000000000000000000000006 "balanceOf(address)(uint256)" $FACTORY --rpc-url https://mainnet.base.org
+   ```
+
+3. **Trigger fee claims**:
+   ```bash
+   # Anyone can call these
+   cast send $FACTORY "claimWethFees()" --private-key $PRIVATE_KEY --rpc-url https://mainnet.base.org
+   cast send $FACTORY "claimBaseTokenFees()" --private-key $PRIVATE_KEY --rpc-url https://mainnet.base.org
+   ```
+
+### Pool and Trading Issues
+
+#### Pool Extensions Not Working
+
+**Problem**: Pool extensions not executing during swaps.
+
+**Diagnosis**:
+
+1. **Check extension registration**:
+   ```bash
+   cast call $HOOK "poolExtension(bytes32)(address)" [POOL_ID] --rpc-url https://mainnet.base.org
+   ```
+
+2. **Check if extension is set up**:
+   ```bash
+   cast call $HOOK "poolExtensionSetup(bytes32)(bool)" [POOL_ID] --rpc-url https://mainnet.base.org
+   ```
+
+3. **Verify allowlist**:
+   ```bash
+   cast call 0xFD549237CdEAbDc14438CAF3f3861e174fDEae46 \
+     "enabledExtensions(address)(bool)" [EXTENSION_ADDRESS] \
+     --rpc-url https://mainnet.base.org
+   ```
+
+**Solutions**:
+
+* Extensions only work for factory-deployed pools
+* Extensions don't execute when locker is the swap sender
+* Contact team if extension should be enabled but isn't
+
+#### MEV Protection Issues
+
+**Problem**: MEV protection not working as expected.
+
+**Diagnosis**:
+
+```bash
+# Check MEV module status
+cast call $HOOK "mevModuleEnabled(bytes32)(bool)" [POOL_ID] --rpc-url https://mainnet.base.org
+
+# Check pool creation time
+cast call $HOOK "poolCreationTimestamp(bytes32)(uint256)" [POOL_ID] --rpc-url https://mainnet.base.org
+
+# MEV protection expires after 2 minutes (120 seconds)
+# If current time > creation + 120, protection is expired
+```
+
+**Expected Behavior**:
+
+* MEV protection lasts maximum 2 minutes
+* No-op module disables itself immediately
+* Custom MEV modules can disable themselves early
+
+#### Liquidity Addition Blocked
+
+**Problem**: Cannot add liquidity to pool.
+
+**Cause**: MEV module is still active and blocking liquidity changes.
+
+**Solution**: Wait for MEV protection to expire (2 minutes max) or for module to disable itself.
+
+### Integration Issues
+
+#### Contract Interface Errors
+
+**Problem**: ABI-related errors when calling contracts.
+
+**Solutions**:
+
+1. **Use correct ABI**: Ensure you're using the right ABI for each contract
+2. **Check function signatures**: Verify function names and parameter types
+3. **Verify contract addresses**: Use [official addresses](/reference/addresses)
+
+**Example Correct Calls**:
+
+```javascript
+// ✅ Correct
+const deploymentInfo = await factory.tokenDeploymentInfo(tokenAddress);
+
+// ❌ Wrong function name  
+const deploymentInfo = await factory.getTokenDeploymentInfo(tokenAddress);
+```
+
+#### Gas Estimation Failures
+
+**Problem**: Gas estimation failing for deployments.
+
+**Solutions**:
+
+1. **Use higher gas limit**:
+   ```typescript
+   await factory.deployToken(config, {
+     gasLimit: 5_000_000  // High limit for deployments
+   });
+   ```
+
+2. **Check configuration validity**: Invalid configs can cause gas estimation to fail
+
+3. **Ensure sufficient ETH**: Account must have enough ETH for gas + extension amounts
+
+#### Event Parsing Issues
+
+**Problem**: Cannot parse contract events properly.
+
+**Common Issues**:
+
+1. **Wrong event signature**:
+   ```typescript
+   // ✅ Correct
+   factory.on('TokenCreated', (sender, tokenAddress, ...args) => {
+     // Handle event
+   });
+
+   // ❌ Wrong event name
+   factory.on('TokenDeployed', ...); // Event doesn't exist
+   ```
+
+2. **Missing ABI**: Ensure contract interface includes all events
+
+3. **Block range too large**: Limit historical queries to reasonable ranges
+
+### Network and RPC Issues
+
+#### RPC Rate Limiting
+
+**Problem**: Getting rate limited by RPC provider.
+
+**Solutions**:
+
+1. **Use multiple RPC endpoints**:
+   ```typescript
+   const fallbackProviders = [
+     'https://mainnet.base.org',
+     'https://base-mainnet.public.blastapi.io',
+     // Add more as backup
+   ];
+   ```
+
+2. **Implement request caching**: Cache responses to reduce RPC calls
+
+3. **Add delays between requests**: Space out rapid successive calls
+
+#### Transaction Failures
+
+**Problem**: Transactions failing with unclear errors.
+
+**Debugging Steps**:
+
+1. **Check transaction receipt**: Look for specific revert reason
+2. **Simulate transaction**: Use `staticCall` to debug before sending
+3. **Verify account state**: Ensure sufficient balance and nonces are correct
+4. **Check gas price**: Ensure gas price is appropriate for network conditions
+
+### Getting Help
+
+#### Community Support
+
+**Discord**: [Join our community](https://discord.gg/feyprotocol)
+
+* Real-time help from community
+* Developer discussions
+* Troubleshooting assistance
+
+**GitHub**: [FEY Protocol Issues](https://github.com/feyprotocol)
+
+* Bug reports
+* Feature requests
+* Technical discussions
+
+**Twitter**: [@feyprotocol](https://twitter.com/feyprotocol)
+
+* Protocol announcements
+* Status updates
+* Community updates
+
+#### Reporting Bugs
+
+When reporting issues, please include:
+
+1. **Clear description** of the problem
+2. **Steps to reproduce** the issue
+3. **Expected vs actual behavior**
+4. **Error messages** (full stack trace if available)
+5. **Environment details** (browser, wallet, etc.)
+6. **Transaction hashes** for on-chain issues
+
+**Template**:
+
+```
+**Problem**: Brief description
+
+**Steps to Reproduce**:
+1. Step 1
+2. Step 2
+3. Error occurs
+
+**Expected**: What should happen
+**Actual**: What actually happens
+
+**Error Message**: 
+```
+
+Error details here
+
+```
+
+**Environment**:
+- Browser: Chrome 120
+- Wallet: MetaMask 11.0
+- Transaction: 0x123...
+
+**Additional Context**: Any other relevant information
+```
+
+#### Emergency Contacts
+
+**Security Issues**: [security@feyprotocol.xyz](mailto\:security@feyprotocol.xyz)
+
+* Critical vulnerabilities
+* Potential exploits
+* Responsible disclosure
+
+**Critical Bugs**: Use GitHub issues with "critical" label
+
+* Protocol-breaking issues
+* Funds at risk scenarios
+
+***
+
+### Prevention Tips
+
+#### Before Deployment
+
+* [ ] Validate all configuration arrays have correct lengths
+* [ ] Ensure reward/position BPS sum to exactly 10000
+* [ ] Verify extension addresses and data encoding
+* [ ] Test on small amounts first
+* [ ] Check factory and protocol status
+
+#### During Integration
+
+* [ ] Use official contract addresses
+* [ ] Implement proper error handling
+* [ ] Add transaction confirmations
+* [ ] Cache frequently accessed data
+* [ ] Monitor for events and errors
+
+#### Monitoring
+
+* [ ] Set up event listeners for critical functions
+* [ ] Monitor fee accumulation and distribution
+* [ ] Track protocol status changes
+* [ ] Alert on failed transactions
+
+**Related Documentation**:
+
+* [Contract Addresses →](/reference/addresses)
+* [Integration Guide →](/guides/integration)
+* [Cast Commands →](/guides/cast-commands)
+* [Security Guide →](/support/security)
+
+
+## Contract Addresses
+
+Complete reference of all FEY Protocol contracts deployed on Base Mainnet.
+
+### Base Mainnet (Chain ID: 8453)
+
+#### Core Contracts
+
+| Contract                      | Address                                                                                                                 | Description                         |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| **Factory (Fey.sol)**         | [`0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d`](https://basescan.org/address/0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d) | Main factory for token deployments  |
+| **FEY Token**                 | [`0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`](https://basescan.org/address/0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D) | Native protocol token (100B supply) |
+| **Hook (FeyHookStaticFeeV2)** | [`0x5B409184204b86f708d3aeBb3cad3F02835f68cC`](https://basescan.org/address/0x5B409184204b86f708d3aeBb3cad3F02835f68cC) | Uniswap V4 hook for fee management  |
+
+#### Supporting Infrastructure
+
+| Contract                            | Address                                                                                                                 | Description                          |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| **LP Locker (FeyLpLockerMultiple)** | [`0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa`](https://basescan.org/address/0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa) | Manages LP positions and rewards     |
+| **Fee Locker (FeyFeeLocker)**       | [`0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6`](https://basescan.org/address/0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6) | Stores and distributes protocol fees |
+| **Pool Extension Allowlist**        | [`0xFD549237CdEAbDc14438CAF3f3861e174fDEae46`](https://basescan.org/address/0xFD549237CdEAbDc14438CAF3f3861e174fDEae46) | Controls approved pool extensions    |
+
+#### Extensions
+
+| Extension             | Address                                                                                                                 | Purpose                                     |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| **FeyUniv4EthDevBuy** | [`0x173077c319c38bb08D4C4968014357fd518446b4`](https://basescan.org/address/0x173077c319c38bb08D4C4968014357fd518446b4) | ETH-based token purchases during deployment |
+
+#### MEV Protection
+
+| Contract       | Address                                                                                                                 | Description                 |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| **FeyMevNoop** | [`0x2ebc0fA629b268dFA3d455b67027d507a562EAC0`](https://basescan.org/address/0x2ebc0fA629b268dFA3d455b67027d507a562EAC0) | No-op MEV module (template) |
+
+#### Key Addresses
+
+| Role                   | Address                                                                                                                 | Purpose                                 |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| **Team Fee Recipient** | [`0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50`](https://basescan.org/address/0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50) | Receives protocol fees for distribution |
+
+### Pool Information
+
+#### Main Pool (FEY/WETH)
+
+| Property         | Value                                                                |
+| ---------------- | -------------------------------------------------------------------- |
+| **Pool ID**      | `0xe155c517c53f078f4b443c99436e42c1b80fd2fb1b3508f431c46b8365e4f3f0` |
+| **Currency0**    | WETH (`0x4200000000000000000000000000000000000006`)                  |
+| **Currency1**    | FEY (`0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`)                   |
+| **Fee Flag**     | Dynamic (0x800000)                                                   |
+| **Tick Spacing** | 200                                                                  |
+| **Hook**         | FeyHookStaticFeeV2 (`0x5B409184204b86f708d3aeBb3cad3F02835f68cC`)    |
+
+### External Dependencies
+
+#### Uniswap V4
+
+| Contract             | Address | Description                  |
+| -------------------- | ------- | ---------------------------- |
+| **Pool Manager**     | TBD     | Uniswap V4 core pool manager |
+| **Position Manager** | TBD     | Uniswap V4 position manager  |
+
+#### Permit2
+
+| Contract    | Address                                                                                                                 | Description                  |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| **Permit2** | [`0x000000000022D473030F116dDEE9F6B43aC78BA3`](https://basescan.org/address/0x000000000022D473030F116dDEE9F6B43aC78BA3) | Universal approval interface |
+
+#### Base Infrastructure
+
+| Contract                    | Address                                                                                                                 | Description              |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| **WETH**                    | [`0x4200000000000000000000000000000000000006`](https://basescan.org/address/0x4200000000000000000000000000000000000006) | Wrapped ETH on Base      |
+| **Superchain Token Bridge** | [`0x4200000000000000000000000000000000000010`](https://basescan.org/address/0x4200000000000000000000000000000000000010) | Cross-chain token bridge |
+
+### Network Details
+
+#### Base Mainnet
+
+| Property         | Value                                  |
+| ---------------- | -------------------------------------- |
+| **Chain ID**     | 8453                                   |
+| **RPC URL**      | `https://mainnet.base.org`             |
+| **Explorer**     | [BaseScan](https://basescan.org)       |
+| **Native Token** | ETH                                    |
+| **Bridge**       | [Base Bridge](https://bridge.base.org) |
+
+### Contract Verification
+
+All contracts are verified on BaseScan with source code available:
+
+#### Factory
+
+* **Address**: `0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d`
+* **Verification**: [View on BaseScan →](https://basescan.org/address/0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d#code)
+
+#### FEY Token
+
+* **Address**: `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`
+* **Verification**: [View on BaseScan →](https://basescan.org/address/0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D#code)
+
+#### Hook
+
+* **Address**: `0x5B409184204b86f708d3aeBb3cad3F02835f68cC`
+* **Verification**: [View on BaseScan →](https://basescan.org/address/0x5B409184204b86f708d3aeBb3cad3F02835f68cC#code)
+
+### Integration Examples
+
+#### Web3 Configuration
+
+```javascript
+// Base mainnet configuration
+const baseConfig = {
+  chainId: 8453,
+  name: 'Base Mainnet',
+  rpcUrl: 'https://mainnet.base.org',
+  blockExplorer: 'https://basescan.org',
+  contracts: {
+    factory: '0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d',
+    feyToken: '0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D',
+    hook: '0x5B409184204b86f708d3aeBb3cad3F02835f68cC',
+    feeLocker: '0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6',
+    lpLocker: '0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa',
+  }
+};
+```
+
+#### Contract Instances
+
+```javascript
+import { ethers } from 'ethers';
+
+// Provider setup
+const provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
+
+// Contract instances
+const factory = new ethers.Contract(
+  '0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d',
+  factoryABI,
+  provider
+);
+
+const feyToken = new ethers.Contract(
+  '0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D',
+  erc20ABI,
+  provider
+);
+
+const hook = new ethers.Contract(
+  '0x5B409184204b86f708d3aeBb3cad3F02835f68cC',
+  hookABI,
+  provider
+);
+```
+
+#### Environment Variables
+
+```bash
+# Base mainnet configuration
+export CHAIN_ID=8453
+export RPC_URL="https://mainnet.base.org"
+export FACTORY_ADDRESS="0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d"
+export FEY_TOKEN_ADDRESS="0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D"
+export HOOK_ADDRESS="0x5B409184204b86f708d3aeBb3cad3F02835f68cC"
+export FEE_LOCKER_ADDRESS="0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6"
+export LP_LOCKER_ADDRESS="0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa"
+```
+
+#### Cast Commands
+
+```bash
+# Set environment for easier commands
+export RPC="https://mainnet.base.org"
+export FACTORY="0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d"
+export FEY="0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D"
+
+# Quick status checks
+cast call $FACTORY "deprecated()(bool)" --rpc-url $RPC
+cast call $FEY "totalSupply()(uint256)" --rpc-url $RPC
+```
+
+### Security Notes
+
+#### Contract Immutability
+
+**Immutable Contracts:**
+
+* Factory core logic (deployment functions)
+* Token contracts (ERC20 functionality)
+* Hook swap logic (fee collection)
+
+**Upgradeable Components:**
+
+* System configuration (admin functions)
+* Module enablement (hooks, lockers, extensions)
+* Fee routing (can be frozen)
+
+#### Admin Controls
+
+**Factory Owner:**
+
+* Enable/disable system modules
+* Set system-wide configuration
+* Freeze critical parameters
+
+**Token Admins:**
+
+* Update token metadata
+* Transfer admin role
+* Verify token authenticity
+
+#### Access Patterns
+
+**Public Functions:**
+
+* Token deployment (`deployToken`)
+* Fee claiming (`claimWethFees`, `claimBaseTokenFees`)
+* Reward collection (`collectRewards`)
+
+**Permissioned Functions:**
+
+* System configuration (owner/admin only)
+* Module management (owner/admin only)
+* Critical parameter changes (owner only)
+
+***
+
+### Related Documentation
+
+* **Contract Details**: [Core Contracts →](/contracts/factory)
+* **Integration Guide**: [Developer Guides →](/guides/integration)
+* **State Queries**: [Cast Commands →](/guides/cast-commands)
+* **Troubleshooting**: [Support →](/support/troubleshooting)
+
+
+## Cast Commands Guide
+
+Complete reference for querying FEY Protocol state using Foundry's `cast` command-line tool.
+
+### Quick Setup
+
+```bash
+# Set environment variables for easier usage
+export RPC_URL="https://mainnet.base.org"
+export FACTORY="0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d"
+export FEY_TOKEN="0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D"
+export HOOK="0x5B409184204b86f708d3aeBb3cad3F02835f68cC"
+export FEE_LOCKER="0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6"
+export LP_LOCKER="0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa"
+export POOL_ID="0xe155c517c53f078f4b443c99436e42c1b80fd2fb1b3508f431c46b8365e4f3f0"
+```
+
+### Factory Contract Queries
+
+#### System Status
+
+```bash
+# Check if factory is deprecated
+cast call $FACTORY "deprecated()(bool)" --rpc-url $RPC_URL
+
+# Get base token (should be FEY)
+cast call $FACTORY "baseToken()(address)" --rpc-url $RPC_URL
+
+# Get team fee recipient
+cast call $FACTORY "teamFeeRecipient()(address)" --rpc-url $RPC_URL
+
+# Get fee locker address
+cast call $FACTORY "feeLocker()(address)" --rpc-url $RPC_URL
+
+# Check freeze status
+cast call $FACTORY "freezeFeeRecipient()(bool)" --rpc-url $RPC_URL
+cast call $FACTORY "feeLockerFrozen()(bool)" --rpc-url $RPC_URL
+```
+
+#### Module Configuration
+
+```bash
+# Check if hook is enabled
+cast call $FACTORY "enabledHooks(address)(bool)" $HOOK --rpc-url $RPC_URL
+
+# Check if locker is enabled for hook
+cast call $FACTORY "enabledLockers(address,address)(bool)" $LP_LOCKER $HOOK --rpc-url $RPC_URL
+
+# Check if dev buy extension is enabled  
+cast call $FACTORY "enabledExtensions(address)(bool)" 0x173077c319c38bb08D4C4968014357fd518446b4 --rpc-url $RPC_URL
+
+# Check if MEV module is enabled
+cast call $FACTORY "enabledMevModules(address)(bool)" 0x2ebc0fA629b268dFA3d455b67027d507a562EAC0 --rpc-url $RPC_URL
+```
+
+#### Token Deployment Info
+
+```bash
+# Get deployment details for any token (example with FEY)
+cast call $FACTORY \
+  "tokenDeploymentInfo(address)((address,address,address,address[]))" \
+  $FEY_TOKEN \
+  --rpc-url $RPC_URL
+
+# Returns: (locker, token, hook, extensions[])
+# Expected for FEY: (0x975...7Fa, 0xD09...91D, 0x5B4...8cC, [0x173...4b4, ...])
+```
+
+### FEY Token Queries
+
+#### Basic Token Information
+
+```bash
+# Token metadata
+cast call $FEY_TOKEN "name()(string)" --rpc-url $RPC_URL
+cast call $FEY_TOKEN "symbol()(string)" --rpc-url $RPC_URL
+cast call $FEY_TOKEN "decimals()(uint8)" --rpc-url $RPC_URL
+
+# Supply information (should be 100B with 18 decimals)
+cast call $FEY_TOKEN "totalSupply()(uint256)" --rpc-url $RPC_URL
+# Expected: 100000000000000000000000000000 (100B * 10^18)
+
+# Check any address balance
+cast call $FEY_TOKEN "balanceOf(address)(uint256)" [ADDRESS] --rpc-url $RPC_URL
+```
+
+#### Token Metadata & Admin
+
+```bash
+# Get all token data in one call
+cast call $FEY_TOKEN "allData()(address,address,string,string,string)" --rpc-url $RPC_URL
+
+# Individual metadata queries
+cast call $FEY_TOKEN "admin()(address)" --rpc-url $RPC_URL
+cast call $FEY_TOKEN "originalAdmin()(address)" --rpc-url $RPC_URL
+cast call $FEY_TOKEN "imageUrl()(string)" --rpc-url $RPC_URL
+cast call $FEY_TOKEN "metadata()(string)" --rpc-url $RPC_URL
+cast call $FEY_TOKEN "context()(string)" --rpc-url $RPC_URL
+
+# Verification status
+cast call $FEY_TOKEN "isVerified()(bool)" --rpc-url $RPC_URL
+```
+
+#### Governance Features
+
+```bash
+# Get voting power (requires delegation first)
+cast call $FEY_TOKEN "getCurrentVotes(address)(uint256)" [ADDRESS] --rpc-url $RPC_URL
+
+# Check delegation
+cast call $FEY_TOKEN "delegates(address)(address)" [ADDRESS] --rpc-url $RPC_URL
+
+# Get historical voting power
+cast call $FEY_TOKEN "getPriorVotes(address,uint256)(uint256)" [ADDRESS] [BLOCK_NUMBER] --rpc-url $RPC_URL
+```
+
+### Hook Contract Queries
+
+#### Pool Configuration
+
+```bash
+# Check if FEY is token0 in main pool
+cast call $HOOK "feyIsToken0(bytes32)(bool)" $POOL_ID --rpc-url $RPC_URL
+
+# Get locker for pool
+cast call $HOOK "locker(bytes32)(address)" $POOL_ID --rpc-url $RPC_URL
+
+# Get pool fees (directional)
+cast call $HOOK "feyFee(bytes32)(uint24)" $POOL_ID --rpc-url $RPC_URL
+cast call $HOOK "pairedFee(bytes32)(uint24)" $POOL_ID --rpc-url $RPC_URL
+
+# Current protocol fee rate
+cast call $HOOK "protocolFee()(uint24)" --rpc-url $RPC_URL
+```
+
+#### MEV Protection Status
+
+```bash
+# Check if MEV module is enabled for pool
+cast call $HOOK "mevModuleEnabled(bytes32)(bool)" $POOL_ID --rpc-url $RPC_URL
+
+# Get pool creation timestamp
+cast call $HOOK "poolCreationTimestamp(bytes32)(uint256)" $POOL_ID --rpc-url $RPC_URL
+
+# Get MEV module for pool
+cast call $HOOK "mevModule(bytes32)(address)" $POOL_ID --rpc-url $RPC_URL
+```
+
+#### Pool Extensions
+
+```bash
+# Get pool extension (if any)
+cast call $HOOK "poolExtension(bytes32)(address)" $POOL_ID --rpc-url $RPC_URL
+
+# Check if extension is set up
+cast call $HOOK "poolExtensionSetup(bytes32)(bool)" $POOL_ID --rpc-url $RPC_URL
+```
+
+#### Constants & Limits
+
+```bash
+# Protocol limits
+cast call $HOOK "MAX_LP_FEE()(uint24)" --rpc-url $RPC_URL
+cast call $HOOK "MAX_MEV_LP_FEE()(uint24)" --rpc-url $RPC_URL
+cast call $HOOK "MAX_MEV_MODULE_DELAY()(uint256)" --rpc-url $RPC_URL
+cast call $HOOK "PROTOCOL_FEE_NUMERATOR()(uint256)" --rpc-url $RPC_URL
+```
+
+### Fee Locker Queries
+
+#### Available Fees
+
+```bash
+# Check available fees for specific owner and token
+cast call $FEE_LOCKER \
+  "availableFees(address,address)(uint256)" \
+  [FEE_OWNER] [TOKEN_ADDRESS] \
+  --rpc-url $RPC_URL
+
+# Check team recipient's FEY fees
+cast call $FEE_LOCKER \
+  "availableFees(address,address)(uint256)" \
+  0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50 \
+  $FEY_TOKEN \
+  --rpc-url $RPC_URL
+```
+
+#### Configuration
+
+```bash
+# Get vault address
+cast call $FEE_LOCKER "vault()(address)" --rpc-url $RPC_URL
+
+# Check if address is allowed depositor
+cast call $FEE_LOCKER "allowedDepositors(address)(bool)" [ADDRESS] --rpc-url $RPC_URL
+
+# Raw fees mapping
+cast call $FEE_LOCKER \
+  "feesToClaim(address,address)(uint256)" \
+  [FEE_OWNER] [TOKEN_ADDRESS] \
+  --rpc-url $RPC_URL
+```
+
+### LP Locker Queries
+
+#### Token Reward Information
+
+```bash
+# Get complete token reward info for FEY
+cast call $LP_LOCKER "tokenRewards(address)" $FEY_TOKEN --rpc-url $RPC_URL
+
+# This returns a complex struct with:
+# - token address
+# - poolKey (5-element tuple)
+# - positionId (NFT ID)
+# - numPositions
+# - rewardBps array
+# - rewardAdmins array  
+# - rewardRecipients array
+```
+
+#### Configuration
+
+```bash
+# System configuration
+cast call $LP_LOCKER "factory()(address)" --rpc-url $RPC_URL
+cast call $LP_LOCKER "feeLocker()(address)" --rpc-url $RPC_URL
+cast call $LP_LOCKER "positionManager()(address)" --rpc-url $RPC_URL
+cast call $LP_LOCKER "permit2()(address)" --rpc-url $RPC_URL
+
+# Constants
+cast call $LP_LOCKER "BASIS_POINTS()(uint256)" --rpc-url $RPC_URL
+cast call $LP_LOCKER "MAX_REWARD_PARTICIPANTS()(uint256)" --rpc-url $RPC_URL
+cast call $LP_LOCKER "MAX_LP_POSITIONS()(uint256)" --rpc-url $RPC_URL
+```
+
+### Fee Balance Monitoring
+
+#### Factory Balances
+
+```bash
+# Check factory's WETH balance (for buybacks)
+cast call 0x4200000000000000000000000000000000000006 \
+  "balanceOf(address)(uint256)" $FACTORY \
+  --rpc-url $RPC_URL
+
+# Check factory's FEY balance (should route to fee locker)
+cast call $FEY_TOKEN \
+  "balanceOf(address)(uint256)" $FACTORY \
+  --rpc-url $RPC_URL
+```
+
+#### Team Recipient Balances
+
+```bash
+# Team recipient's FEY balance
+cast call $FEY_TOKEN \
+  "balanceOf(address)(uint256)" 0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50 \
+  --rpc-url $RPC_URL
+
+# Team recipient's WETH balance
+cast call 0x4200000000000000000000000000000000000006 \
+  "balanceOf(address)(uint256)" 0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50 \
+  --rpc-url $RPC_URL
+```
+
+### Extension Queries
+
+#### Pool Extension Allowlist
+
+```bash
+# Check if extension is enabled
+cast call 0xFD549237CdEAbDc14438CAF3f3861e174fDEae46 \
+  "enabledExtensions(address)(bool)" [EXTENSION_ADDRESS] \
+  --rpc-url $RPC_URL
+
+# Check dev buy extension
+cast call 0xFD549237CdEAbDc14438CAF3f3861e174fDEae46 \
+  "enabledExtensions(address)(bool)" 0x173077c319c38bb08D4C4968014357fd518446b4 \
+  --rpc-url $RPC_URL
+```
+
+### Operational Commands
+
+:::warning[Requires Private Key]
+These commands modify state and require a funded wallet with private key.
+:::
+
+#### Fee Claims (Public Functions)
+
+```bash
+# Claim WETH fees from factory (anyone can call)
+cast send $FACTORY "claimWethFees()" \
+  --private-key $PRIVATE_KEY \
+  --rpc-url $RPC_URL
+
+# Claim FEY fees from factory (anyone can call)  
+cast send $FACTORY "claimBaseTokenFees()" \
+  --private-key $PRIVATE_KEY \
+  --rpc-url $RPC_URL
+
+# Collect rewards for a token (anyone can call)
+cast send $LP_LOCKER "collectRewards(address)" $FEY_TOKEN \
+  --private-key $PRIVATE_KEY \
+  --rpc-url $RPC_URL
+```
+
+#### Personal Fee Claims
+
+```bash
+# Claim your personal fees from fee locker
+cast send $FEE_LOCKER \
+  "claim(address,address)" $MY_ADDRESS $TOKEN_ADDRESS \
+  --private-key $PRIVATE_KEY \
+  --rpc-url $RPC_URL
+```
+
+### Advanced Queries
+
+#### Pool ID Verification
+
+```bash
+# Verify the FEY/WETH pool ID calculation
+# Pool ID should be: 0xe155c517c53f078f4b443c99436e42c1b80fd2fb1b3508f431c46b8365e4f3f0
+
+# Components:
+# currency0: 0x4200000000000000000000000000000000000006 (WETH)
+# currency1: 0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D (FEY)  
+# fee: 0x800000 (DYNAMIC_FEE_FLAG)
+# tickSpacing: 200
+# hooks: 0x5B409184204b86f708d3aeBb3cad3F02835f68cC
+```
+
+#### Event Monitoring
+
+```bash
+# Get recent TokenCreated events
+cast logs \
+  --from-block 12000000 \
+  --to-block latest \
+  --address $FACTORY \
+  --event-signature "TokenCreated(address,address,address,string,string,string,string,string,address,bytes32,int24,address,address,address,uint256,address[])" \
+  --rpc-url $RPC_URL
+
+# Get recent fee claim events  
+cast logs \
+  --from-block 12000000 \
+  --to-block latest \
+  --address $FACTORY \
+  --event-signature "ClaimFees(address,address,uint256)" \
+  --rpc-url $RPC_URL
+```
+
+### Batch Queries
+
+#### System Health Check
+
+Create a script to check overall system status:
+
+```bash
+#!/bin/bash
+# system_check.sh
+
+echo "=== FEY Protocol System Check ==="
+echo
+
+echo "Factory Status:"
+echo "- Deprecated: $(cast call $FACTORY 'deprecated()(bool)' --rpc-url $RPC_URL)"
+echo "- Base Token: $(cast call $FACTORY 'baseToken()(address)' --rpc-url $RPC_URL)"
+echo "- Fee Recipient: $(cast call $FACTORY 'teamFeeRecipient()(address)' --rpc-url $RPC_URL)"
+echo
+
+echo "FEY Token:"
+echo "- Total Supply: $(cast call $FEY_TOKEN 'totalSupply()(uint256)' --rpc-url $RPC_URL)"
+echo "- Verified: $(cast call $FEY_TOKEN 'isVerified()(bool)' --rpc-url $RPC_URL)"
+echo
+
+echo "Main Pool ($POOL_ID):"
+echo "- FEY is Token0: $(cast call $HOOK 'feyIsToken0(bytes32)(bool)' $POOL_ID --rpc-url $RPC_URL)"
+echo "- FEY Fee: $(cast call $HOOK 'feyFee(bytes32)(uint24)' $POOL_ID --rpc-url $RPC_URL)"
+echo "- Paired Fee: $(cast call $HOOK 'pairedFee(bytes32)(uint24)' $POOL_ID --rpc-url $RPC_URL)"
+echo
+
+echo "Fee Balances:"
+echo "- Factory WETH: $(cast call 0x4200000000000000000000000000000000000006 'balanceOf(address)(uint256)' $FACTORY --rpc-url $RPC_URL)"
+echo "- Factory FEY: $(cast call $FEY_TOKEN 'balanceOf(address)(uint256)' $FACTORY --rpc-url $RPC_URL)"
+echo
+```
+
+#### Token Analysis
+
+```bash
+#!/bin/bash
+# token_analysis.sh TOKEN_ADDRESS
+
+TOKEN=$1
+echo "=== Token Analysis: $TOKEN ==="
+
+# Get deployment info
+echo "Deployment Info:"
+cast call $FACTORY "tokenDeploymentInfo(address)((address,address,address,address[]))" $TOKEN --rpc-url $RPC_URL
+
+# Get token metadata
+echo -e "\nToken Metadata:"
+cast call $TOKEN "allData()(address,address,string,string,string)" --rpc-url $RPC_URL
+
+# Get reward info if available
+echo -e "\nReward Info:"
+cast call $LP_LOCKER "tokenRewards(address)" $TOKEN --rpc-url $RPC_URL
+```
+
+### Integration Examples
+
+#### JavaScript Integration
+
+```javascript
+// Query system status
+async function getSystemStatus() {
+  const factory = new ethers.Contract(FACTORY, factoryABI, provider);
+  
+  return {
+    deprecated: await factory.deprecated(),
+    baseToken: await factory.baseToken(),
+    teamFeeRecipient: await factory.teamFeeRecipient(),
+    feyTotalSupply: await feyToken.totalSupply(),
+    factoryWethBalance: await weth.balanceOf(FACTORY),
+    factoryFeyBalance: await feyToken.balanceOf(FACTORY)
+  };
+}
+
+// Monitor fee claims
+factory.on('ClaimFees', (token, recipient, amount, event) => {
+  console.log(`Fee claimed: ${amount} of ${token} to ${recipient}`);
+});
+```
+
+#### Python Integration
+
+```python
+from web3 import Web3
+
+# Setup
+w3 = Web3(Web3.HTTPProvider('https://mainnet.base.org'))
+factory = w3.eth.contract(address=FACTORY, abi=factory_abi)
+
+# Query functions
+def get_token_deployment_info(token_address):
+    return factory.functions.tokenDeploymentInfo(token_address).call()
+
+def check_available_fees(fee_owner, token):
+    fee_locker = w3.eth.contract(address=FEE_LOCKER, abi=fee_locker_abi)
+    return fee_locker.functions.availableFees(fee_owner, token).call()
+```
+
+### Common Use Cases
+
+#### Monitor Protocol Revenue
+
+```bash
+# Track fee accumulation over time
+while true; do
+  echo "$(date): WETH Balance: $(cast call 0x4200000000000000000000000000000000000006 'balanceOf(address)(uint256)' $FACTORY --rpc-url $RPC_URL)"
+  sleep 300  # Check every 5 minutes
+done
+```
+
+#### Verify Token Authenticity
+
+```bash
+# Check if a token was deployed through FEY
+TOKEN_ADDRESS="0x..."
+DEPLOYMENT_INFO=$(cast call $FACTORY "tokenDeploymentInfo(address)((address,address,address,address[]))" $TOKEN_ADDRESS --rpc-url $RPC_URL)
+
+if [[ $DEPLOYMENT_INFO == *"0x000000000000"* ]]; then
+  echo "Token not deployed through FEY"
+else
+  echo "Token deployed through FEY: $DEPLOYMENT_INFO"
+fi
+```
+
+#### Check Reward Eligibility
+
+```bash
+# Check if you have claimable rewards
+MY_ADDRESS="0x..."
+FEY_REWARDS=$(cast call $FEE_LOCKER "availableFees(address,address)(uint256)" $MY_ADDRESS $FEY_TOKEN --rpc-url $RPC_URL)
+echo "Claimable FEY rewards: $FEY_REWARDS"
+```
+
+***
+
+### Related Documentation
+
+* **Contract Addresses**: [Reference →](/reference/addresses)
+* **Integration Guide**: [Developer Guides →](/guides/integration)
+* **Troubleshooting**: [Support →](/support/troubleshooting)
+* **Contract Details**: [Core Contracts →](/contracts/factory)
+
+
+## Extensions
+
+This page provides information about extending the Fey protocol.
+
+### Coming Soon
+
+Detailed documentation for extensions will be available here.
+
+
+## Integration Guide
+
+Learn how to integrate FEY Protocol into your application, from basic queries to full deployment interfaces.
+
+### Quick Start
+
+#### Installation
+
+```bash
+# Using npm
+npm install ethers viem
+
+# Using yarn  
+yarn add ethers viem
+
+# Using pnpm
+pnpm add ethers viem
+```
+
+#### Basic Setup
+
+```typescript
+import { ethers } from 'ethers';
+import { createPublicClient, http } from 'viem';
+import { base } from 'viem/chains';
+
+// Provider setup
+const provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
+
+// Viem client
+const publicClient = createPublicClient({
+  chain: base,
+  transport: http('https://mainnet.base.org')
+});
+
+// Contract addresses
+export const CONTRACTS = {
+  factory: '0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d',
+  feyToken: '0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D',
+  hook: '0x5B409184204b86f708d3aeBb3cad3F02835f68cC',
+  feeLocker: '0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6',
+  lpLocker: '0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa',
+} as const;
+```
+
+### Core Integration Patterns
+
+#### 1. Protocol State Queries
+
+```typescript
+import { factoryABI, feyTokenABI, hookABI } from './abis';
+
+class FeyProtocolClient {
+  private provider: ethers.Provider;
+  private contracts: Record<string, ethers.Contract>;
+
+  constructor(provider: ethers.Provider) {
+    this.provider = provider;
+    this.contracts = {
+      factory: new ethers.Contract(CONTRACTS.factory, factoryABI, provider),
+      feyToken: new ethers.Contract(CONTRACTS.feyToken, feyTokenABI, provider),
+      hook: new ethers.Contract(CONTRACTS.hook, hookABI, provider),
+    };
+  }
+
+  // Get protocol status
+  async getProtocolStatus() {
+    const [deprecated, baseToken, totalSupply, teamFeeRecipient] = await Promise.all([
+      this.contracts.factory.deprecated(),
+      this.contracts.factory.baseToken(),
+      this.contracts.feyToken.totalSupply(),
+      this.contracts.factory.teamFeeRecipient(),
+    ]);
+
+    return {
+      deprecated,
+      baseToken,
+      totalSupply: totalSupply.toString(),
+      teamFeeRecipient,
+      protocolReady: !deprecated && baseToken !== ethers.ZeroAddress,
+    };
+  }
+
+  // Get token deployment information
+  async getTokenInfo(tokenAddress: string) {
+    try {
+      const deploymentInfo = await this.contracts.factory.tokenDeploymentInfo(tokenAddress);
+      const tokenContract = new ethers.Contract(tokenAddress, feyTokenABI, this.provider);
+      
+      const [name, symbol, decimals, totalSupply, metadata] = await Promise.all([
+        tokenContract.name(),
+        tokenContract.symbol(),
+        tokenContract.decimals(),
+        tokenContract.totalSupply(),
+        tokenContract.allData(),
+      ]);
+
+      return {
+        address: tokenAddress,
+        name,
+        symbol,
+        decimals,
+        totalSupply: totalSupply.toString(),
+        deploymentInfo: {
+          locker: deploymentInfo.locker,
+          hook: deploymentInfo.hook,
+          extensions: deploymentInfo.extensions,
+        },
+        metadata: {
+          originalAdmin: metadata[0],
+          admin: metadata[1],
+          image: metadata[2],
+          metadata: metadata[3],
+          context: metadata[4],
+        },
+        deployedThroughFey: deploymentInfo.locker !== ethers.ZeroAddress,
+      };
+    } catch (error) {
+      throw new Error(`Failed to get token info: ${error.message}`);
+    }
+  }
+
+  // Get fee information for an address
+  async getFeeInfo(feeOwner: string, tokenAddress: string) {
+    const feeLocker = new ethers.Contract(CONTRACTS.feeLocker, feeLockerABI, this.provider);
+    const availableFees = await feeLocker.availableFees(feeOwner, tokenAddress);
+    
+    return {
+      feeOwner,
+      token: tokenAddress,
+      availableFees: availableFees.toString(),
+      hasClaimableFees: availableFees > 0n,
+    };
+  }
+}
+```
+
+#### 2. Token Deployment Interface
+
+```typescript
+interface DeploymentConfig {
+  tokenConfig: {
+    name: string;
+    symbol: string;
+    image: string;
+    metadata: string;
+    context: string;
+    tokenAdmin: string;
+    salt: string;
+    originatingChainId: number;
+  };
+  poolConfig: {
+    hook: string;
+    pairedToken: string;
+    tickIfToken0IsFey: number;
+    tickSpacing: number;
+    poolData: string;
+  };
+  lockerConfig: {
+    locker: string;
+    tickLower: number[];
+    tickUpper: number[];
+    positionBps: number[];
+    rewardBps: number[];
+    rewardAdmins: string[];
+    rewardRecipients: string[];
+  };
+  mevModuleConfig: {
+    mevModule: string;
+    mevModuleData: string;
+  };
+  extensionConfigs: {
+    extension: string;
+    extensionBps: number;
+    msgValue: string;
+    extensionData: string;
+  }[];
+}
+
+class FeyDeploymentService {
+  private signer: ethers.Signer;
+  private factory: ethers.Contract;
+
+  constructor(signer: ethers.Signer) {
+    this.signer = signer;
+    this.factory = new ethers.Contract(CONTRACTS.factory, factoryABI, signer);
+  }
+
+  // Create a basic deployment configuration
+  createBasicConfig(params: {
+    name: string;
+    symbol: string;
+    image?: string;
+    metadata?: string;
+    context?: string;
+    rewardRecipient: string;
+    devBuyAmount?: string; // ETH amount
+  }): DeploymentConfig {
+    return {
+      tokenConfig: {
+        name: params.name,
+        symbol: params.symbol,
+        image: params.image || '',
+        metadata: params.metadata || '',
+        context: params.context || '',
+        tokenAdmin: params.rewardRecipient,
+        salt: ethers.hexlify(ethers.randomBytes(32)),
+        originatingChainId: 8453, // Base mainnet
+      },
+      poolConfig: {
+        hook: CONTRACTS.hook,
+        pairedToken: ethers.ZeroAddress, // Will be overridden to FEY
+        tickIfToken0IsFey: -276326, // Starting price tick
+        tickSpacing: 200,
+        poolData: this.encodePoolData({
+          extension: params.devBuyAmount ? '0x173077c319c38bb08D4C4968014357fd518446b4' : ethers.ZeroAddress,
+          extensionData: '0x',
+          feeData: ethers.AbiCoder.defaultAbiCoder().encode(
+            ['uint24', 'uint24'], 
+            [3000, 3000] // 0.3% fees both directions
+          ),
+        }),
+      },
+      lockerConfig: {
+        locker: CONTRACTS.lpLocker,
+        tickLower: [-887272], // Full range
+        tickUpper: [887272],
+        positionBps: [10000], // 100% to single position
+        rewardBps: [10000], // 100% to single recipient
+        rewardAdmins: [params.rewardRecipient],
+        rewardRecipients: [params.rewardRecipient],
+      },
+      mevModuleConfig: {
+        mevModule: '0x2ebc0fA629b268dFA3d455b67027d507a562EAC0', // Noop module
+        mevModuleData: '0x',
+      },
+      extensionConfigs: params.devBuyAmount ? [{
+        extension: '0x173077c319c38bb08D4C4968014357fd518446b4',
+        extensionBps: 0, // No token allocation for dev buy
+        msgValue: ethers.parseEther(params.devBuyAmount).toString(),
+        extensionData: this.encodeDevBuyData(params.rewardRecipient),
+      }] : [],
+    };
+  }
+
+  // Deploy token with configuration
+  async deployToken(config: DeploymentConfig, options?: {
+    gasLimit?: number;
+    onProgress?: (step: string) => void;
+  }) {
+    const { onProgress } = options || {};
+    
+    try {
+      onProgress?.('Validating configuration...');
+      this.validateConfig(config);
+
+      onProgress?.('Calculating ETH requirements...');
+      const totalEthRequired = config.extensionConfigs.reduce(
+        (sum, ext) => sum + BigInt(ext.msgValue),
+        0n
+      );
+
+      onProgress?.('Submitting deployment transaction...');
+      const tx = await this.factory.deployToken(config, {
+        value: totalEthRequired,
+        gasLimit: options?.gasLimit || 5_000_000,
+      });
+
+      onProgress?.('Waiting for confirmation...');
+      const receipt = await tx.wait();
+
+      onProgress?.('Extracting token address...');
+      const tokenCreatedEvent = receipt.logs.find(log => {
+        try {
+          const parsed = this.factory.interface.parseLog(log);
+          return parsed?.name === 'TokenCreated';
+        } catch {
+          return false;
+        }
+      });
+
+      if (!tokenCreatedEvent) {
+        throw new Error('TokenCreated event not found');
+      }
+
+      const parsedEvent = this.factory.interface.parseLog(tokenCreatedEvent);
+      const tokenAddress = parsedEvent.args.tokenAddress;
+
+      onProgress?.('Deployment completed!');
+      
+      return {
+        tokenAddress,
+        transactionHash: tx.hash,
+        blockNumber: receipt.blockNumber,
+        gasUsed: receipt.gasUsed.toString(),
+        events: this.parseDeploymentEvents(receipt),
+      };
+
+    } catch (error) {
+      throw new Error(`Deployment failed: ${error.message}`);
+    }
+  }
+
+  private encodePoolData(params: {
+    extension: string;
+    extensionData: string;
+    feeData: string;
+  }) {
+    return ethers.AbiCoder.defaultAbiCoder().encode(
+      ['address', 'bytes', 'bytes'],
+      [params.extension, params.extensionData, params.feeData]
+    );
+  }
+
+  private encodeDevBuyData(recipient: string) {
+    // Encode dev buy extension data
+    const feyWethPoolKey = {
+      currency0: '0x4200000000000000000000000000000000000006', // WETH
+      currency1: CONTRACTS.feyToken,
+      fee: 0x800000, // Dynamic fee flag
+      tickSpacing: 200,
+      hooks: CONTRACTS.hook,
+    };
+
+    return ethers.AbiCoder.defaultAbiCoder().encode(
+      ['address', 'tuple(address,address,uint24,int24,address)', 'uint128'],
+      [recipient, Object.values(feyWethPoolKey), 1] // Minimum 1 wei output
+    );
+  }
+
+  private validateConfig(config: DeploymentConfig) {
+    // Validate reward BPS sum to 10000
+    const totalRewardBps = config.lockerConfig.rewardBps.reduce((sum, bps) => sum + bps, 0);
+    if (totalRewardBps !== 10000) {
+      throw new Error(`Reward BPS must sum to 10000, got ${totalRewardBps}`);
+    }
+
+    // Validate position BPS sum to 10000
+    const totalPositionBps = config.lockerConfig.positionBps.reduce((sum, bps) => sum + bps, 0);
+    if (totalPositionBps !== 10000) {
+      throw new Error(`Position BPS must sum to 10000, got ${totalPositionBps}`);
+    }
+
+    // Validate array lengths match
+    const { rewardBps, rewardAdmins, rewardRecipients } = config.lockerConfig;
+    if (rewardBps.length !== rewardAdmins.length || rewardBps.length !== rewardRecipients.length) {
+      throw new Error('Reward arrays must have matching lengths');
+    }
+
+    // Validate tick configuration
+    const { tickLower, tickUpper, positionBps } = config.lockerConfig;
+    if (tickLower.length !== tickUpper.length || tickLower.length !== positionBps.length) {
+      throw new Error('Position arrays must have matching lengths');
+    }
+  }
+
+  private parseDeploymentEvents(receipt: ethers.TransactionReceipt) {
+    const events = [];
+    for (const log of receipt.logs) {
+      try {
+        const parsed = this.factory.interface.parseLog(log);
+        if (parsed) events.push(parsed);
+      } catch {
+        // Skip unparseable logs
+      }
+    }
+    return events;
+  }
+}
+```
+
+#### 3. Real-time Monitoring
+
+```typescript
+class FeyMonitoringService {
+  private provider: ethers.Provider;
+  private contracts: Record<string, ethers.Contract>;
+  private eventListeners: Map<string, () => void> = new Map();
+
+  constructor(provider: ethers.Provider) {
+    this.provider = provider;
+    this.contracts = {
+      factory: new ethers.Contract(CONTRACTS.factory, factoryABI, provider),
+      feyToken: new ethers.Contract(CONTRACTS.feyToken, feyTokenABI, provider),
+    };
+  }
+
+  // Monitor new token deployments
+  onTokenCreated(callback: (event: any) => void) {
+    const listener = this.contracts.factory.on('TokenCreated', (...args) => {
+      const event = args[args.length - 1]; // Last arg is the event
+      callback({
+        tokenAddress: args[1],
+        creator: args[0],
+        name: args[5],
+        symbol: args[6],
+        transactionHash: event.transactionHash,
+        blockNumber: event.blockNumber,
+      });
+    });
+
+    this.eventListeners.set('tokenCreated', () => {
+      this.contracts.factory.off('TokenCreated', listener);
+    });
+  }
+
+  // Monitor fee claims
+  onFeeClaimed(callback: (event: any) => void) {
+    const listener = this.contracts.factory.on('ClaimFees', (token, recipient, amount, event) => {
+      callback({
+        token,
+        recipient,
+        amount: amount.toString(),
+        transactionHash: event.transactionHash,
+        blockNumber: event.blockNumber,
+      });
+    });
+
+    this.eventListeners.set('feeClaimed', () => {
+      this.contracts.factory.off('ClaimFees', listener);
+    });
+  }
+
+  // Monitor token transfers (for volume tracking)
+  onTokenTransfer(tokenAddress: string, callback: (event: any) => void) {
+    const tokenContract = new ethers.Contract(tokenAddress, feyTokenABI, this.provider);
+    
+    const listener = tokenContract.on('Transfer', (from, to, amount, event) => {
+      callback({
+        from,
+        to,
+        amount: amount.toString(),
+        token: tokenAddress,
+        transactionHash: event.transactionHash,
+        blockNumber: event.blockNumber,
+      });
+    });
+
+    this.eventListeners.set(`transfer-${tokenAddress}`, () => {
+      tokenContract.off('Transfer', listener);
+    });
+  }
+
+  // Get historical events
+  async getTokenCreationHistory(fromBlock: number = 0) {
+    const filter = this.contracts.factory.filters.TokenCreated();
+    const events = await this.contracts.factory.queryFilter(filter, fromBlock);
+    
+    return events.map(event => ({
+      tokenAddress: event.args.tokenAddress,
+      creator: event.args.msgSender,
+      name: event.args.tokenName,
+      symbol: event.args.tokenSymbol,
+      blockNumber: event.blockNumber,
+      transactionHash: event.transactionHash,
+    }));
+  }
+
+  // Clean up all listeners
+  cleanup() {
+    for (const cleanup of this.eventListeners.values()) {
+      cleanup();
+    }
+    this.eventListeners.clear();
+  }
+}
+```
+
+### React Integration
+
+#### Custom Hooks
+
+```typescript
+// hooks/useFeyProtocol.ts
+import { useState, useEffect } from 'react';
+import { useProvider } from 'wagmi';
+
+export function useFeyProtocol() {
+  const provider = useProvider();
+  const [protocolStatus, setProtocolStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const client = new FeyProtocolClient(provider);
+    
+    client.getProtocolStatus()
+      .then(setProtocolStatus)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [provider]);
+
+  return { protocolStatus, loading };
+}
+
+export function useTokenInfo(tokenAddress?: string) {
+  const provider = useProvider();
+  const [tokenInfo, setTokenInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!tokenAddress) return;
+
+    setLoading(true);
+    const client = new FeyProtocolClient(provider);
+    
+    client.getTokenInfo(tokenAddress)
+      .then(setTokenInfo)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [provider, tokenAddress]);
+
+  return { tokenInfo, loading };
+}
+
+export function useRealtimeEvents() {
+  const provider = useProvider();
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const monitor = new FeyMonitoringService(provider);
+    
+    monitor.onTokenCreated((event) => {
+      setEvents(prev => [event, ...prev].slice(0, 100)); // Keep last 100 events
+    });
+
+    monitor.onFeeClaimed((event) => {
+      setEvents(prev => [event, ...prev].slice(0, 100));
+    });
+
+    return () => monitor.cleanup();
+  }, [provider]);
+
+  return events;
+}
+```
+
+#### Component Examples
+
+```tsx
+// components/ProtocolStatus.tsx
+import { useFeyProtocol } from '../hooks/useFeyProtocol';
+
+export function ProtocolStatus() {
+  const { protocolStatus, loading } = useFeyProtocol();
+
+  if (loading) return <div>Loading...</div>;
+
+  return (
+    <div className="protocol-status">
+      <h2>FEY Protocol Status</h2>
+      <div className={`status-indicator ${protocolStatus?.protocolReady ? 'ready' : 'not-ready'}`}>
+        {protocolStatus?.protocolReady ? '🟢 Protocol Ready' : '🔴 Protocol Not Ready'}
+      </div>
+      
+      <div className="details">
+        <p><strong>Base Token:</strong> {protocolStatus?.baseToken}</p>
+        <p><strong>Total Supply:</strong> {protocolStatus?.totalSupply}</p>
+        <p><strong>Deprecated:</strong> {protocolStatus?.deprecated ? 'Yes' : 'No'}</p>
+      </div>
+    </div>
+  );
+}
+
+// components/TokenDeploymentForm.tsx
+import { useState } from 'react';
+import { useSigner } from 'wagmi';
+import { FeyDeploymentService } from '../services/deployment';
+
+export function TokenDeploymentForm() {
+  const { data: signer } = useSigner();
+  const [formData, setFormData] = useState({
+    name: '',
+    symbol: '',
+    devBuyAmount: '0',
+  });
+  const [deploying, setDeploying] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!signer) return;
+
+    setDeploying(true);
+    try {
+      const service = new FeyDeploymentService(signer);
+      const config = service.createBasicConfig({
+        ...formData,
+        rewardRecipient: await signer.getAddress(),
+      });
+
+      const result = await service.deployToken(config, {
+        onProgress: (step) => console.log(step),
+      });
+
+      setResult(result);
+    } catch (error) {
+      console.error('Deployment failed:', error);
+    } finally {
+      setDeploying(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="deployment-form">
+      <div>
+        <label>Token Name:</label>
+        <input
+          value={formData.name}
+          onChange={(e) => setFormData({...formData, name: e.target.value})}
+          required
+        />
+      </div>
+      
+      <div>
+        <label>Symbol:</label>
+        <input
+          value={formData.symbol}
+          onChange={(e) => setFormData({...formData, symbol: e.target.value})}
+          required
+        />
+      </div>
+      
+      <div>
+        <label>Dev Buy Amount (ETH):</label>
+        <input
+          type="number"
+          step="0.01"
+          value={formData.devBuyAmount}
+          onChange={(e) => setFormData({...formData, devBuyAmount: e.target.value})}
+        />
+      </div>
+
+      <button type="submit" disabled={deploying || !signer}>
+        {deploying ? 'Deploying...' : 'Deploy Token'}
+      </button>
+
+      {result && (
+        <div className="deployment-result">
+          <h3>Deployment Successful!</h3>
+          <p><strong>Token Address:</strong> {result.tokenAddress}</p>
+          <p><strong>Transaction:</strong> {result.transactionHash}</p>
+        </div>
+      )}
+    </form>
+  );
+}
+```
+
+### Testing Integration
+
+#### Unit Tests
+
+```typescript
+// tests/integration.test.ts
+import { describe, it, expect, beforeEach } from 'vitest';
+import { ethers } from 'ethers';
+import { FeyProtocolClient } from '../src/client';
+
+describe('FEY Protocol Integration', () => {
+  let client: FeyProtocolClient;
+  let provider: ethers.Provider;
+
+  beforeEach(() => {
+    provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
+    client = new FeyProtocolClient(provider);
+  });
+
+  it('should get protocol status', async () => {
+    const status = await client.getProtocolStatus();
+    
+    expect(status).toHaveProperty('deprecated');
+    expect(status).toHaveProperty('baseToken');
+    expect(status).toHaveProperty('totalSupply');
+    expect(status.baseToken).toBe(CONTRACTS.feyToken);
+  });
+
+  it('should get FEY token information', async () => {
+    const tokenInfo = await client.getTokenInfo(CONTRACTS.feyToken);
+    
+    expect(tokenInfo.name).toBe('FEY');
+    expect(tokenInfo.symbol).toBe('FEY');
+    expect(tokenInfo.decimals).toBe(18);
+    expect(tokenInfo.deployedThroughFey).toBe(true);
+  });
+
+  it('should validate deployment config', () => {
+    const service = new FeyDeploymentService(mockSigner);
+    
+    expect(() => {
+      service['validateConfig']({
+        lockerConfig: {
+          rewardBps: [5000, 4000], // Only sums to 9000
+          rewardAdmins: ['0x1', '0x2'],
+          rewardRecipients: ['0x1', '0x2'],
+          positionBps: [10000],
+          tickLower: [-100],
+          tickUpper: [100],
+        },
+      } as any);
+    }).toThrow('Reward BPS must sum to 10000');
+  });
+});
+```
+
+#### Integration Tests
+
+```typescript
+// tests/e2e.test.ts
+import { describe, it, expect } from 'vitest';
+import { ethers } from 'ethers';
+
+describe('End-to-End Integration', () => {
+  // Note: These tests require a funded test wallet and should run on testnet
+  
+  it('should deploy a token end-to-end', async () => {
+    // This would be a comprehensive test of the entire deployment flow
+    // Requires testnet environment and funded wallet
+  });
+  
+  it('should monitor events correctly', async () => {
+    // Test event monitoring functionality
+  });
+});
+```
+
+### Error Handling
+
+#### Common Error Patterns
+
+```typescript
+export class FeyIntegrationError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public details?: any
+  ) {
+    super(message);
+    this.name = 'FeyIntegrationError';
+  }
+}
+
+export function handleContractError(error: any): never {
+  // Parse common contract errors
+  if (error.code === 'CALL_EXCEPTION') {
+    if (error.reason?.includes('Deprecated')) {
+      throw new FeyIntegrationError(
+        'Factory is currently deprecated',
+        'FACTORY_DEPRECATED'
+      );
+    }
+    
+    if (error.reason?.includes('BaseTokenNotSet')) {
+      throw new FeyIntegrationError(
+        'Protocol not fully initialized',
+        'PROTOCOL_NOT_READY'
+      );
+    }
+  }
+
+  if (error.code === 'INSUFFICIENT_FUNDS') {
+    throw new FeyIntegrationError(
+      'Insufficient ETH for deployment',
+      'INSUFFICIENT_FUNDS',
+      { required: error.value, available: error.balance }
+    );
+  }
+
+  // Generic error
+  throw new FeyIntegrationError(
+    `Contract interaction failed: ${error.message}`,
+    'CONTRACT_ERROR',
+    error
+  );
+}
+
+// Usage in methods
+async getTokenInfo(tokenAddress: string) {
+  try {
+    // ... contract calls
+  } catch (error) {
+    handleContractError(error);
+  }
+}
+```
+
+### Best Practices
+
+#### Performance Optimization
+
+```typescript
+// Use multicall for batch queries
+import { multicall } from '@wagmi/core';
+
+async function batchTokenQueries(tokenAddresses: string[]) {
+  const calls = tokenAddresses.flatMap(address => [
+    {
+      address: address as `0x${string}`,
+      abi: feyTokenABI,
+      functionName: 'name',
+    },
+    {
+      address: address as `0x${string}`,
+      abi: feyTokenABI,
+      functionName: 'symbol',
+    },
+    {
+      address: CONTRACTS.factory as `0x${string}`,
+      abi: factoryABI,
+      functionName: 'tokenDeploymentInfo',
+      args: [address],
+    },
+  ]);
+
+  const results = await multicall({ contracts: calls });
+  
+  // Process batched results
+  return tokenAddresses.map((address, i) => ({
+    address,
+    name: results[i * 3]?.result,
+    symbol: results[i * 3 + 1]?.result,
+    deploymentInfo: results[i * 3 + 2]?.result,
+  }));
+}
+```
+
+#### Caching Strategy
+
+```typescript
+class CachedFeyClient extends FeyProtocolClient {
+  private cache = new Map<string, { data: any; timestamp: number }>();
+  private readonly CACHE_TTL = 60000; // 1 minute
+
+  async getTokenInfo(tokenAddress: string) {
+    const cacheKey = `token-${tokenAddress}`;
+    const cached = this.cache.get(cacheKey);
+    
+    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+      return cached.data;
+    }
+
+    const data = await super.getTokenInfo(tokenAddress);
+    this.cache.set(cacheKey, { data, timestamp: Date.now() });
+    
+    return data;
+  }
+}
+```
+
+***
+
+### Related Documentation
+
+* **Contract Addresses**: [Reference →](/reference/addresses)
+* **Cast Commands**: [Command Reference →](/guides/cast-commands)
+* **Token Deployment**: [Deployment Guide →](/flows/deployment)
+* **Troubleshooting**: [Support →](/support/troubleshooting)
+
+
+## Queries
+
+This page provides guidance on querying the Fey protocol.
+
+### Coming Soon
+
+Detailed query documentation will be available here.
+
+
+## Token Deployment
+
+Learn how to deploy tokens on the FEY Protocol, including configuration options, best practices, and the complete deployment flow.
+
+### Overview
+
+Token deployment on FEY Protocol is a comprehensive process that creates not just a token, but an entire trading ecosystem with liquidity positions, fee distribution, and optional extensions.
+
+#### What Gets Created
+
+Every deployment creates:
+
+* **ERC20 Token**: 100B supply with governance and cross-chain features
+* **Uniswap V4 Pool**: TOKEN/FEY pair with dynamic fees
+* **LP Positions**: Up to 7 concentrated liquidity positions
+* **Reward System**: Configurable fee splits to multiple recipients
+* **MEV Protection**: 2-minute protection window for fair launch
+* **Extensions**: Optional dev buy, presale, or other functionality
+
+### Deployment Configuration
+
+#### TokenConfig
+
+```typescript
+interface TokenConfig {
+  name: string;                 // Token name (e.g., "My Token")
+  symbol: string;               // Token symbol (e.g., "MTK")
+  image: string;                // Image URL for token logo
+  metadata: string;             // JSON metadata URL
+  context: string;              // Additional context/description
+  tokenAdmin: address;          // Admin address for token management
+  salt: uint256;                // CREATE2 salt for deterministic address
+  originatingChainId: uint256;  // Chain where token is first created
+}
+```
+
+#### PoolConfig
+
+```typescript
+interface PoolConfig {
+  hook: address;                // FEY Hook address
+  pairedToken: address;         // Paired token (overridden to FEY)
+  tickIfToken0IsFey: int24;     // Starting tick if FEY is token0
+  tickSpacing: int24;           // Tick spacing (200 for FEY pools)
+  poolData: bytes;              // Encoded pool initialization data
+}
+```
+
+#### LockerConfig
+
+```typescript
+interface LockerConfig {
+  locker: address;              // LP Locker contract address
+  tickLower: int24[];           // Lower ticks for LP positions
+  tickUpper: int24[];           // Upper ticks for LP positions
+  positionBps: uint16[];        // Token allocation per position (basis points)
+  rewardBps: uint16[];          // Fee split per recipient (basis points)
+  rewardAdmins: address[];      // Admin addresses for each reward
+  rewardRecipients: address[];  // Recipient addresses for fees
+}
+```
+
+#### ExtensionConfig
+
+```typescript
+interface ExtensionConfig {
+  extension: address;           // Extension contract address
+  extensionBps: uint16;         // Token allocation to extension
+  msgValue: uint256;           // ETH to send to extension
+  extensionData: bytes;        // Extension-specific configuration
+}
+```
+
+### Step-by-Step Deployment
+
+#### 1. Prepare Configuration
+
+Before deployment, gather all required information:
+
+```javascript
+const deploymentConfig = {
+  tokenConfig: {
+    name: "My Amazing Token",
+    symbol: "MAT",
+    image: "https://example.com/token-logo.png",
+    metadata: "https://example.com/metadata.json",
+    context: "A revolutionary token for...",
+    tokenAdmin: "0x1234...5678", // Your address
+    salt: "0x1234567890abcdef",
+    originatingChainId: 8453 // Base mainnet
+  },
+  poolConfig: {
+    hook: "0x5B409184204b86f708d3aeBb3cad3F02835f68cC",
+    pairedToken: "0x0000000000000000000000000000000000000000", // Will be set to FEY
+    tickIfToken0IsFey: -276326, // Starting price tick
+    tickSpacing: 200,
+    poolData: "0x..." // Encoded pool data
+  },
+  lockerConfig: {
+    locker: "0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa",
+    tickLower: [-887272], // Single full-range position
+    tickUpper: [887272],
+    positionBps: [10000], // 100% of tokens
+    rewardBps: [10000], // 100% of rewards to one recipient
+    rewardAdmins: ["0x1234...5678"],
+    rewardRecipients: ["0x1234...5678"]
+  },
+  mevModuleConfig: {
+    mevModule: "0x2ebc0fA629b268dFA3d455b67027d507a562EAC0",
+    mevModuleData: "0x"
+  },
+  extensionConfigs: [
+    {
+      extension: "0x173077c319c38bb08D4C4968014357fd518446b4", // Dev buy
+      extensionBps: 0, // No token allocation for dev buy
+      msgValue: ethers.parseEther("1.0"), // 1 ETH for dev buy
+      extensionData: encodedDevBuyData
+    }
+  ]
+};
+```
+
+#### 2. Encode Extension Data
+
+For dev buy extension:
+
+```javascript
+function encodeDevBuyData(recipient, pairedTokenPoolKey, pairedTokenAmountOutMinimum) {
+  return ethers.AbiCoder.defaultAbiCoder().encode(
+    ['address', 'tuple(address,address,uint24,int24,address)', 'uint128'],
+    [recipient, pairedTokenPoolKey, pairedTokenAmountOutMinimum]
+  );
+}
+```
+
+#### 3. Calculate Required ETH
+
+```javascript
+// Calculate total ETH needed for extensions
+const totalEthRequired = deploymentConfig.extensionConfigs.reduce(
+  (sum, ext) => sum + ext.msgValue,
+  0n
+);
+```
+
+#### 4. Execute Deployment
+
+```javascript
+// Deploy token with configuration
+const factory = new ethers.Contract(
+  "0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d",
+  factoryABI,
+  signer
+);
+
+const tx = await factory.deployToken(deploymentConfig, {
+  value: totalEthRequired, // ETH for extensions
+  gasLimit: 5000000 // Deployment requires significant gas
+});
+
+const receipt = await tx.wait();
+```
+
+#### 5. Extract Token Address
+
+```javascript
+// Get token address from TokenCreated event
+const tokenCreatedEvent = receipt.logs.find(
+  log => log.fragment?.name === 'TokenCreated'
+);
+
+const tokenAddress = tokenCreatedEvent.args.tokenAddress;
+console.log("Token deployed at:", tokenAddress);
+```
+
+### Deployment Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Factory
+    participant Deployer
+    participant Hook
+    participant Locker
+    participant Extension
+    participant PoolManager
+
+    User->>Factory: deployToken(config) + ETH
+    
+    rect rgb(240, 248, 255)
+        Note over Factory, Deployer: Token Creation Phase
+        Factory->>Deployer: deployToken(tokenConfig, 100B)
+        Deployer->>Deployer: CREATE2 new FeyToken
+        Deployer-->>Factory: tokenAddress
+    end
+
+    rect rgb(245, 255, 245)
+        Note over Factory, PoolManager: Pool Setup Phase
+        Factory->>Hook: initializePool(...)
+        Hook->>PoolManager: poolManager.initialize()
+        Hook->>Hook: Store pool configuration
+        Hook-->>Factory: poolKey
+    end
+
+    rect rgb(255, 248, 240)
+        Note over Factory, Locker: Liquidity Phase  
+        Factory->>Locker: placeLiquidity(...)
+        Locker->>PoolManager: Mint LP positions
+        Locker->>Locker: Configure reward splits
+        Locker-->>Factory: positionIds
+    end
+
+    rect rgb(248, 240, 255)
+        Note over Factory, Extension: Extension Phase
+        Factory->>Extension: receiveTokens{value}(...)
+        Extension->>Extension: Execute dev buy logic
+        Extension->>PoolManager: Perform swaps
+        Extension-->>Factory: Complete
+    end
+
+    rect rgb(255, 245, 245)
+        Note over Factory, Hook: Finalization Phase
+        Factory->>Hook: initializeMevModule(...)
+        Hook->>Hook: Enable MEV protection
+        Factory->>Factory: Store deployment info
+        Factory-->>User: tokenAddress
+    end
+```
+
+### Best Practices
+
+#### Token Configuration
+
+**Naming:**
+
+* Use clear, memorable names
+* Avoid special characters
+* Keep symbols short (2-5 characters)
+
+**Metadata:**
+
+* Host images on reliable CDNs
+* Use standard token metadata format
+* Include comprehensive descriptions
+
+**Admin Address:**
+
+* Use a secure, controlled address
+* Consider multi-sig for important tokens
+* Plan for potential admin transfers
+
+#### Liquidity Setup
+
+**Position Configuration:**
+
+* Full-range positions for maximum liquidity
+* Consider multiple positions for price ranges
+* Ensure position basis points sum to 10,000
+
+**Reward Distribution:**
+
+* Plan long-term reward recipients
+* Use secure admin addresses
+* Consider decentralized governance
+
+**Fee Optimization:**
+
+* Understand tick spacing requirements
+* Plan starting price carefully
+* Consider market conditions
+
+#### Extension Usage
+
+**Dev Buy Configuration:**
+
+* Set reasonable ETH amounts
+* Configure slippage protection
+* Use secure recipient addresses
+
+**Future Extensions:**
+
+* Plan for additional functionality
+* Keep extension allocations reasonable
+* Test thoroughly before mainnet
+
+### Common Patterns
+
+#### Standard Fair Launch
+
+```javascript
+// Simple fair launch with dev buy
+{
+  extensionConfigs: [
+    {
+      extension: DEV_BUY_EXTENSION,
+      extensionBps: 0, // No token allocation
+      msgValue: ethers.parseEther("5.0"), // 5 ETH buy
+      extensionData: encodeDevBuyData(deployer, feyWethPool, minOut)
+    }
+  ],
+  lockerConfig: {
+    rewardBps: [10000], // 100% to deployer
+    rewardRecipients: [deployer]
+  }
+}
+```
+
+#### Community Launch
+
+```javascript
+// Launch with community treasury
+{
+  lockerConfig: {
+    rewardBps: [5000, 5000], // 50/50 split
+    rewardRecipients: [deployer, communityTreasury],
+    rewardAdmins: [deployer, communityMultisig]
+  }
+}
+```
+
+#### Team Launch
+
+```javascript
+// Launch with team allocation
+{
+  extensionConfigs: [
+    {
+      extension: TEAM_VESTING_EXTENSION,
+      extensionBps: 1000, // 10% to team vesting
+      msgValue: 0,
+      extensionData: encodeVestingData(teamAddresses, vestingSchedule)
+    }
+  ],
+  lockerConfig: {
+    rewardBps: [7000, 3000], // 70% deployer, 30% team
+    rewardRecipients: [deployer, teamTreasury]
+  }
+}
+```
+
+### Monitoring Deployment
+
+#### Track Progress
+
+```javascript
+// Monitor deployment transaction
+const deploymentTx = await factory.deployToken(config, { value: ethValue });
+
+// Wait for confirmation
+const receipt = await deploymentTx.wait(2); // Wait for 2 confirmations
+
+// Extract all relevant events
+const events = receipt.logs.map(log => {
+  try {
+    return factory.interface.parseLog(log);
+  } catch (e) {
+    return null;
+  }
+}).filter(Boolean);
+
+console.log("Deployment events:", events);
+```
+
+#### Verify Deployment
+
+```javascript
+// Check token deployment info
+const deploymentInfo = await factory.tokenDeploymentInfo(tokenAddress);
+console.log("Locker:", deploymentInfo.locker);
+console.log("Hook:", deploymentInfo.hook);
+console.log("Extensions:", deploymentInfo.extensions);
+
+// Verify token properties
+const token = new ethers.Contract(tokenAddress, tokenABI, provider);
+const totalSupply = await token.totalSupply();
+const name = await token.name();
+
+console.log(`${name}: ${totalSupply.toString()} total supply`);
+```
+
+### Troubleshooting
+
+#### Common Issues
+
+**Deployment Reverts:**
+
+* Check all arrays have matching lengths
+* Ensure reward BPS sum to 10,000
+* Verify extension configurations
+* Check ETH amount covers all extensions
+
+**MEV Module Issues:**
+
+* Ensure MEV module is enabled in factory
+* Check module initialization data
+* Verify module contract compatibility
+
+**Extension Failures:**
+
+* Verify extension is enabled in allowlist
+* Check extension data encoding
+* Ensure sufficient ETH for extensions
+
+#### Error Messages
+
+| Error                       | Cause                         | Solution                               |
+| --------------------------- | ----------------------------- | -------------------------------------- |
+| `Deprecated`                | Factory deprecated            | Wait for reactivation or use bootstrap |
+| `BaseTokenNotSet`           | No base token configured      | Complete protocol bootstrap            |
+| `ExtensionNotEnabled`       | Extension not approved        | Add to allowlist first                 |
+| `InvalidRewardBps`          | Reward BPS don't sum to 10000 | Fix reward distribution                |
+| `ExtensionMsgValueMismatch` | ETH amount mismatch           | Match ETH to extension configs         |
+
+***
+
+### Next Steps
+
+After deployment:
+
+* **Monitor Trading**: [Trading & Swaps →](/flows/swapping)
+* **Claim Rewards**: [Fee Collection →](/flows/fees)
+* **Track Performance**: [State Queries →](/guides/queries)
+* **Manage Token**: [Admin Operations →](/support/admin)
+
+
+## Fee Flow
+
+This page explains how fees are processed and distributed.
+
+### Coming Soon
+
+Detailed fee flow documentation will be available here.
+
+
+## Swapping Flow
+
+This page describes the token swapping process in the Fey protocol.
+
+### Coming Soon
+
+Detailed swapping flow documentation will be available here.
+
+
+## Factory Contract
+
+The Factory is the central orchestrator of the FEY Protocol, responsible for token deployment, system configuration, and fee management.
+
+**Contract Address**: `0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d`
+
+### Overview
+
+The Factory contract serves as the entry point for token deployments and the control center for protocol-wide settings. It coordinates with all other system components to create a seamless deployment and fee distribution experience.
+
+#### Key Responsibilities
+
+* **Token Deployment**: Creates new FEY-compatible tokens with 100B supply
+* **Pool Initialization**: Sets up Uniswap V4 pools with hooks and configuration
+* **System Configuration**: Manages enabled modules (hooks, lockers, extensions, MEV)
+* **Fee Routing**: Routes WETH and FEY fees to appropriate destinations
+* **Access Control**: Owner/admin/bootstrap role management
+
+### Core Functions
+
+#### Token Deployment
+
+```solidity
+function deployToken(DeploymentConfig memory deploymentConfig) 
+    public payable nonReentrant 
+    returns (address tokenAddress)
+```
+
+The main function for creating new tokens. Requires comprehensive configuration and can include ETH for extensions.
+
+**Parameters:**
+
+* `deploymentConfig`: Complete deployment configuration including token metadata, pool settings, liquidity config, and extensions
+
+**Returns:**
+
+* `tokenAddress`: Address of the newly created token
+
+**Process:**
+
+1. Validates deployment is allowed (not deprecated, or using bootstrap)
+2. Creates token via `FeyDeployer.deployToken()`
+3. Initializes pool through hook contract
+4. Sets up liquidity positions via locker
+5. Executes extensions (dev buys, etc.)
+6. Enables MEV protection
+7. Stores deployment info for tracking
+
+#### Fee Management
+
+```solidity
+function claimWethFees() external nonReentrant
+function claimBaseTokenFees() external nonReentrant
+```
+
+Public functions for routing accumulated fees to their destinations.
+
+**claimWethFees:**
+
+* Transfers all WETH balance to `teamFeeRecipient`
+* Used for manual buyback process
+* Can be called by anyone
+
+**claimBaseTokenFees:**
+
+* Routes FEY fees to `feeLocker` (if set) or `teamFeeRecipient`
+* Automatic storage for staker distribution
+* Can be called by anyone
+
+#### System Configuration
+
+```solidity
+function setBaseToken(address baseToken_) external onlyOwnerAdminOrBootstrap
+function setHook(address hook, bool enabled) external onlyOwnerAdminOrBootstrap
+function setLocker(address locker, address hook, bool enabled) external onlyOwnerAdminOrBootstrap
+function setExtension(address extension, bool enabled) external onlyOwnerAdminOrBootstrap
+function setMevModule(address mevModule, bool enabled) external onlyOwnerAdminOrBootstrap
+```
+
+Administrative functions for configuring protocol modules.
+
+**Access Control:**
+
+* `onlyOwnerAdminOrBootstrap`: Owner, admin, or bootstrap can call
+* Bootstrap permissions can be released permanently
+* Some settings can be frozen permanently
+
+### State Variables
+
+#### Core Configuration
+
+```solidity
+address public baseToken;           // FEY token address (0xD09...91D)
+bool public deprecated;             // Blocks new deployments if true  
+address public teamFeeRecipient;    // Receives fees (0x72f...d8C50)
+address public feeLocker;          // Stores fees for stakers
+address public bootstrap;          // Bootstrap permissions
+bool public freezeFeeRecipient;    // Locks fee recipient if true
+bool public feeLockerFrozen;      // Locks fee locker if true
+```
+
+#### Module Registries
+
+```solidity
+mapping(address hook => bool enabled) enabledHooks;
+mapping(address locker => mapping(address hook => bool enabled)) enabledLockers;
+mapping(address extension => bool enabled) enabledExtensions;
+mapping(address mevModule => bool enabled) enabledMevModules;
+```
+
+#### Deployment Tracking
+
+```solidity
+mapping(address token => DeploymentInfo) deploymentInfoForToken;
+```
+
+Stores complete deployment information for each token created through the factory.
+
+### Data Structures
+
+#### DeploymentConfig
+
+```solidity
+struct DeploymentConfig {
+    TokenConfig tokenConfig;
+    PoolConfig poolConfig;
+    LockerConfig lockerConfig;
+    MevModuleConfig mevModuleConfig;
+    ExtensionConfig[] extensionConfigs;
+}
+```
+
+#### TokenConfig
+
+```solidity
+struct TokenConfig {
+    string name;                    // Token name
+    string symbol;                  // Token symbol
+    string image;                   // Image URL
+    string metadata;               // Metadata URL
+    string context;                // Additional context
+    address tokenAdmin;            // Token admin address
+    uint256 salt;                  // CREATE2 salt
+    uint256 originatingChainId;    // Chain where token originates
+}
+```
+
+#### DeploymentInfo
+
+```solidity
+struct DeploymentInfo {
+    address locker;        // LP position manager
+    address token;         // Token address
+    address hook;          // Pool hook
+    address[] extensions;  // Used extensions
+}
+```
+
+### Access Control
+
+#### Role Hierarchy
+
+**Owner** (Highest privileges)
+
+* Set all system parameters
+* Freeze critical settings
+* Manage admin roles
+
+**Admin**
+
+* Configure modules and extensions
+* Manage non-critical settings
+* Trigger fee claims
+
+**Bootstrap**
+
+* Special role for initial setup
+* Can be permanently released
+* Required for initial base token setting
+
+#### Security Features
+
+```solidity
+function freezeTeamFeeRecipient() external onlyOwner
+function freezeFeeLocker() external onlyOwner
+```
+
+Permanent freeze mechanisms for critical addresses:
+
+* Once frozen, addresses cannot be changed
+* Provides security guarantees for users
+* Irreversible protection against malicious changes
+
+### Events
+
+#### Token Creation
+
+```solidity
+event TokenCreated(
+    address indexed msgSender,
+    address indexed tokenAddress,
+    address indexed tokenAdmin,
+    string tokenMetadata,
+    string tokenImage,
+    string tokenName,
+    string tokenSymbol,
+    string tokenContext,
+    address poolHook,
+    PoolId poolId,
+    int24 startingTick,
+    address pairedToken,
+    address locker,
+    address mevModule,
+    uint256 extensionsSupply,
+    address[] extensions
+);
+```
+
+#### System Configuration
+
+```solidity
+event SetHook(address indexed hook, bool enabled);
+event SetLocker(address indexed locker, address indexed hook, bool enabled);
+event SetExtension(address indexed extension, bool enabled);
+event SetMevModule(address indexed mevModule, bool enabled);
+```
+
+#### Fee Management
+
+```solidity
+event ClaimFees(address indexed token, address indexed recipient, uint256 amount);
+event ExtensionTriggered(address indexed extension, uint256 tokenAmount, uint256 ethAmount);
+```
+
+### Usage Examples
+
+#### Query Token Deployment Info
+
+```javascript
+// Get deployment details for FEY token
+const deploymentInfo = await factory.tokenDeploymentInfo(
+  "0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D"
+);
+console.log("Locker:", deploymentInfo.locker);
+console.log("Hook:", deploymentInfo.hook);
+console.log("Extensions:", deploymentInfo.extensions);
+```
+
+#### Check System Status
+
+```javascript
+// Verify factory configuration
+const isDeprecated = await factory.deprecated();
+const baseToken = await factory.baseToken();
+const teamRecipient = await factory.teamFeeRecipient();
+
+console.log("Factory deprecated:", isDeprecated);
+console.log("Base token:", baseToken);
+console.log("Team recipient:", teamRecipient);
+```
+
+#### Monitor Fee Claims
+
+```javascript
+// Listen for fee claim events
+factory.on("ClaimFees", (token, recipient, amount, event) => {
+  console.log(`Fees claimed: ${amount} of ${token} to ${recipient}`);
+});
+```
+
+### Integration Notes
+
+#### For Frontend Developers
+
+**Token Deployment Interface:**
+
+1. Collect deployment configuration from user
+2. Prepare extension configurations (dev buy amounts, etc.)
+3. Call `deployToken()` with appropriate ETH value
+4. Monitor `TokenCreated` event for deployment confirmation
+
+**Fee Monitoring:**
+
+1. Track fee accumulation in factory
+2. Provide UI for triggering fee claims
+3. Show real-time protocol revenue
+
+#### For Protocol Integrators
+
+**Module Integration:**
+
+1. Implement required interfaces (IFeyExtension, IFeyLpLocker, etc.)
+2. Get module approved via admin functions
+3. Test integration with deployment flow
+
+**State Monitoring:**
+
+1. Monitor deployment events for new tokens
+2. Track fee flows and distributions
+3. Query deployment info for analytics
+
+***
+
+### Related Documentation
+
+* **Hook System**: [Hook Contract →](/contracts/hook)
+* **Token Details**: [FEY Token →](/contracts/token)
+* **Deployment Flow**: [Token Deployment →](/flows/deployment)
+* **Fee System**: [Fee Distribution →](/architecture/fees)
+
+
+## Hook Contract
+
+This page documents the Hook contract functionality.
+
+### Coming Soon
+
+Detailed Hook contract documentation will be available here.
+
+
+## FEY Token Contract
+
+The FEY Token is the native token of the FEY Protocol, serving as the base pairing token for all deployments and the reward/governance token for the network.
+
+**Contract Address**: `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`
+
+### Overview
+
+FEY is an advanced ERC20 token with additional features for governance, cross-chain compatibility, and gasless transactions. It serves multiple roles within the FEY Protocol ecosystem.
+
+#### Token Properties
+
+* **Name**: FEY
+* **Symbol**: FEY
+* **Decimals**: 18
+* **Total Supply**: 100,000,000,000 FEY (100 billion tokens)
+* **Supply Model**: Fixed supply, no inflation
+
+#### Key Features
+
+**🗳️ Governance Ready**: ERC20Votes implementation for future DAO functionality
+**🌉 Cross-Chain**: IERC7802 Superchain token bridge compatibility
+**⛽ Gasless Transactions**: ERC20Permit for meta-transactions
+**🔥 Burnable**: ERC20Burnable for potential deflationary mechanisms
+**🔐 Admin Controlled**: Updatable metadata and verification system
+
+### Core Functions
+
+#### Standard ERC20
+
+The token implements full ERC20 functionality with standard functions:
+
+```solidity
+function transfer(address to, uint256 amount) external returns (bool)
+function transferFrom(address from, address to, uint256 amount) external returns (bool)
+function approve(address spender, uint256 amount) external returns (bool)
+function balanceOf(address account) external view returns (uint256)
+function totalSupply() external view returns (uint256)
+function allowance(address owner, address spender) external view returns (uint256)
+```
+
+#### Governance Features (ERC20Votes)
+
+```solidity
+function delegate(address delegatee) external
+function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external
+function getCurrentVotes(address account) external view returns (uint256)
+function getPriorVotes(address account, uint256 blockNumber) external view returns (uint256)
+```
+
+**Governance Capabilities:**
+
+* **Vote Delegation**: Token holders can delegate voting power
+* **Historical Voting**: Query voting power at specific block numbers
+* **Self-Delegation**: Holders must delegate to themselves to activate voting power
+* **Future DAO**: Foundation for potential governance implementation
+
+#### Gasless Transactions (ERC20Permit)
+
+```solidity
+function permit(
+    address owner,
+    address spender,
+    uint256 value,
+    uint256 deadline,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+) external
+```
+
+**Benefits:**
+
+* **No ETH Required**: Users can approve without holding ETH
+* **Better UX**: Eliminates separate approval transactions
+* **Meta-Transaction Ready**: Supports gasless transaction patterns
+
+#### Token Burning (ERC20Burnable)
+
+```solidity
+function burn(uint256 amount) public
+function burnFrom(address account, uint256 amount) public
+```
+
+**Use Cases:**
+
+* **Deflationary Mechanisms**: Potential future fee burning
+* **Supply Reduction**: Permanent token removal from circulation
+* **Holder Control**: Token holders can burn their own tokens
+
+### Metadata Management
+
+#### Admin Functions
+
+```solidity
+function updateAdmin(address admin_) external
+function updateImage(string memory image_) external  
+function updateMetadata(string memory metadata_) external
+```
+
+**Admin Privileges:**
+
+* **Image Updates**: Change token logo/visual representation
+* **Metadata Updates**: Update JSON metadata
+* **Admin Transfer**: Transfer admin role to different address
+
+**Access Control:**
+
+* Only current admin can make changes
+* Admin role is transferable
+* Original admin retains verification rights
+
+#### Token Information
+
+```solidity
+function admin() external view returns (address)
+function originalAdmin() external view returns (address)
+function imageUrl() external view returns (string memory)
+function metadata() external view returns (string memory)
+function context() external view returns (string memory)
+```
+
+**Data Retrieval:**
+
+* **Current Admin**: Active admin address
+* **Original Admin**: Immutable creator address
+* **Image URL**: Token logo/image location
+* **Metadata**: JSON metadata URL
+* **Context**: Additional context information
+
+#### Batch Data Access
+
+```solidity
+function allData() external view returns (
+    address originalAdmin,
+    address admin,
+    string memory image,
+    string memory metadata,
+    string memory context
+)
+```
+
+Convenience function for retrieving all token metadata in a single call.
+
+### Verification System
+
+#### Token Verification
+
+```solidity
+function verify() external
+function isVerified() external view returns (bool)
+```
+
+**Verification Process:**
+
+* Only `originalAdmin` can verify the token
+* Verification is permanent (cannot be undone)
+* Provides authenticity guarantees for users
+
+**Benefits:**
+
+* **Authenticity**: Proves token is official
+* **Trust**: Users can verify legitimate tokens
+* **Permanence**: Cannot be revoked once set
+
+### Cross-Chain Functionality
+
+#### Superchain Token Bridge (IERC7802)
+
+```solidity
+function crosschainMint(address _to, uint256 _amount) external
+function crosschainBurn(address _from, uint256 _amount) external
+```
+
+**Bridge Integration:**
+
+* **Authorized Minting**: Only Superchain Token Bridge can mint
+* **Burn on Transfer**: Tokens burned when bridging out
+* **Event Tracking**: Bridge events for monitoring
+
+**Cross-Chain Features:**
+
+* **Multi-Chain Deployment**: Same token across Superchain networks
+* **Unified Supply**: Total supply maintained across chains
+* **Native Bridge**: Built-in Optimism/Base bridge compatibility
+
+#### Chain-Specific Minting
+
+During deployment, tokens are only minted on the originating chain:
+
+```solidity
+if (block.chainid == initialSupplyChainId_) {
+    _mint(msg.sender, maxSupply_);
+}
+```
+
+**Supply Distribution:**
+
+* **Originating Chain**: Full 100B supply minted
+* **Other Chains**: Zero initial supply
+* **Bridge Transfers**: Supply moves via burn/mint
+
+### Technical Implementation
+
+#### Interface Support
+
+```solidity
+function supportsInterface(bytes4 _interfaceId) public pure returns (bool)
+```
+
+**Supported Interfaces:**
+
+* **IERC20**: Standard ERC20 functionality
+* **IERC7802**: Superchain token bridge
+* **IERC165**: Interface detection
+* **IERC5805**: Governance (ERC20Votes)
+
+#### Security Features
+
+**Reentrancy Protection:**
+
+* Critical functions use `nonReentrant` modifier
+* Prevents reentrancy attacks during transfers
+
+**Access Control:**
+
+* Admin functions restricted to current admin
+* Verification restricted to original admin
+* Bridge functions restricted to authorized bridge
+
+### Events
+
+#### Administrative Events
+
+```solidity
+event UpdateAdmin(address indexed oldAdmin, address indexed newAdmin);
+event UpdateImage(string image);
+event UpdateMetadata(string metadata);
+event Verified(address indexed admin, address indexed token);
+```
+
+#### Cross-Chain Events
+
+```solidity
+event CrosschainMint(address indexed _to, uint256 _amount, address indexed _sender);
+event CrosschainBurn(address indexed _from, uint256 _amount, address indexed _sender);
+```
+
+### Usage Examples
+
+#### Check Token Information
+
+```javascript
+// Get basic token info
+const name = await feyToken.name();
+const symbol = await feyToken.symbol();
+const totalSupply = await feyToken.totalSupply();
+const decimals = await feyToken.decimals();
+
+console.log(`${name} (${symbol})`);
+console.log(`Total Supply: ${totalSupply.toString()}`);
+console.log(`Decimals: ${decimals}`);
+```
+
+#### Query Metadata
+
+```javascript
+// Get all metadata at once
+const [originalAdmin, admin, image, metadata, context] = await feyToken.allData();
+
+console.log("Original Admin:", originalAdmin);
+console.log("Current Admin:", admin);
+console.log("Image URL:", image);
+console.log("Metadata:", metadata);
+console.log("Context:", context);
+```
+
+#### Check Verification Status
+
+```javascript
+// Verify token authenticity
+const isVerified = await feyToken.isVerified();
+const originalAdmin = await feyToken.originalAdmin();
+
+console.log("Token verified:", isVerified);
+console.log("Original creator:", originalAdmin);
+```
+
+#### Monitor Admin Changes
+
+```javascript
+// Listen for admin updates
+feyToken.on("UpdateAdmin", (oldAdmin, newAdmin, event) => {
+  console.log(`Admin changed from ${oldAdmin} to ${newAdmin}`);
+});
+
+// Listen for metadata updates
+feyToken.on("UpdateImage", (image, event) => {
+  console.log(`Token image updated: ${image}`);
+});
+```
+
+#### Gasless Approvals
+
+```javascript
+// Create permit signature for gasless approval
+const permit = await createPermitSignature(
+  feyToken,
+  owner,
+  spender,
+  amount,
+  deadline
+);
+
+// Submit permit transaction (can be done by anyone)
+await feyToken.permit(
+  owner,
+  spender,
+  amount,
+  deadline,
+  permit.v,
+  permit.r,
+  permit.s
+);
+```
+
+### Integration Notes
+
+#### For DeFi Protocols
+
+**Token Integration:**
+
+* Standard ERC20 compatibility
+* Fixed supply (no inflation risk)
+* Burnable (deflationary potential)
+* Governance ready (future voting)
+
+**Metadata Handling:**
+
+* Dynamic image and metadata URLs
+* Verification status for authenticity
+* Admin-controlled updates
+
+#### For Cross-Chain Applications
+
+**Bridge Integration:**
+
+* Native Superchain bridge support
+* Automatic burn/mint mechanics
+* Cross-chain supply tracking
+
+**Multi-Chain Support:**
+
+* Same contract deployed across chains
+* Unified token identity
+* Seamless transfers
+
+***
+
+### Related Documentation
+
+* **Tokenomics**: [Token Mechanics →](/architecture/tokenomics)
+* **Staking**: [Fee Distribution →](/architecture/fees)
+* **Usage**: [Getting Started →](/getting-started)
+* **Contract Addresses**: [Reference →](/reference/addresses)
+
+
+## Contracts
+
+This page provides an overview of all smart contracts in the Fey protocol.
+
+### Coming Soon
+
+Detailed contracts documentation will be available here.
+
+
+## Fees
+
+This page explains the fee structure and mechanism in the Fey protocol.
+
+### Coming Soon
+
+Detailed fees documentation will be available here.
+
+
+## Protocol Overview
+
+FEY Protocol is built as a layered system on top of Uniswap V4, creating the first fully permissionless, user-owned launchpad. This page explains the high-level architecture and how all components work together.
+
+### System Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│                 User Layer                  │
+│         (Traders, Token Creators)          │
+└─────────────────────────────────────────────┘
+                        │
+┌─────────────────────────────────────────────┐
+│              Extension Layer                │
+│     (DevBuy, Future: Presale, Vesting)     │
+└─────────────────────────────────────────────┘
+                        │
+┌─────────────────────────────────────────────┐
+│               Factory Layer                 │
+│        (Token Deploy, Pool Init)           │
+└─────────────────────────────────────────────┘
+                        │
+┌─────────────────────────────────────────────┐
+│               Hook Layer                    │
+│    (Fee Management, MEV Protection)        │
+└─────────────────────────────────────────────┘
+                        │
+┌─────────────────────────────────────────────┐
+│             Uniswap V4 Core                 │
+│         (Pool Management, Swaps)           │
+└─────────────────────────────────────────────┘
+```
+
+#### Layer Responsibilities
+
+**User Layer**
+
+* Token creators deploy new projects
+* Traders swap tokens and provide liquidity
+* Stakers earn protocol fees
+
+**Extension Layer**
+
+* Modular functionality for deployments
+* Dev buys, airdrops, presales, vesting
+* Permissioned through allowlist contract
+
+**Factory Layer**
+
+* Central orchestrator for deployments
+* Coordinates token creation and pool setup
+* Manages system configuration
+
+**Hook Layer**
+
+* Integrates with Uniswap V4 pools
+* Handles fee collection and distribution
+* Provides MEV protection and extensions
+
+**Uniswap V4 Core**
+
+* Decentralized exchange infrastructure
+* Pool management and swap execution
+* Liquidity position handling
+
+### Core Value Flows
+
+#### 1. Fee Distribution Flow
+
+```mermaid
+graph TD
+    A[User Swaps Token] --> B[LP Fee Generated]
+    B --> C[80% to LP Providers]
+    B --> D[20% to Protocol]
+    D --> E[Hook Collects Fee]
+    E --> F[Factory Routes Fee]
+    F --> G{Fee Token Type}
+    G -->|FEY| H[Fee Locker Storage]
+    G -->|WETH| I[teamFeeRecipient]
+    H --> J[Stakers Claim]
+    I --> K[Manual Buyback]
+    K --> L[Staking Distribution]
+```
+
+#### 2. Token Deployment Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Factory
+    participant Hook
+    participant Locker
+    participant Extension
+
+    User->>Factory: deployToken(config)
+    Factory->>Factory: Create token (100B supply)
+    Factory->>Hook: initializePool()
+    Factory->>Locker: placeLiquidity()
+    Locker->>Locker: Mint LP positions
+    Factory->>Extension: receiveTokens{value}()
+    Extension->>Extension: Dev buy execution
+    Factory->>Hook: initializeMevModule()
+```
+
+#### 3. Creator Reward Flow
+
+```mermaid
+graph LR
+    A[Token Trading] --> B[LP Fees Generated]
+    B --> C[Creator Share: 1%]
+    C --> D[Paid in $FEY]
+    D --> E[Creator can stake $FEY]
+    E --> F[Earn from all network activity]
+```
+
+### Network Economics
+
+#### Fixed Supply Model
+
+FEY operates with a fixed token supply that creates deflationary pressure:
+
+* **Total Supply**: 100,000,000,000 $FEY (100B tokens, fixed)
+* **No Inflation**: No new tokens ever created
+* **Buyback Pressure**: WETH fees converted to $FEY and distributed
+* **Burn Potential**: Future governance could implement fee burns
+
+#### Value Accrual Mechanisms
+
+**Direct Fee Distribution**
+
+* 20% of all LP fees flow to protocol
+* 100% redistribution to $FEY stakers
+* Immediate value accrual from network activity
+
+**Automatic Buybacks**
+
+* WETH fees trigger $FEY market purchases
+* Reduces circulating supply
+* Creates consistent buy pressure
+
+**Creator Alignment**
+
+* All creator rewards paid in $FEY
+* Successful creators become $FEY holders
+* Long-term network alignment
+
+#### Network Effects
+
+As FEY grows, it creates self-reinforcing loops:
+
+1. **More Tokens** → More trading volume
+2. **More Volume** → Higher protocol fees → Better staking returns
+3. **Better Returns** → More $FEY demand → Higher price
+4. **Higher Price** → Better creator rewards → Attracts more creators
+5. **Loop continues** → Strengthening network effects
+
+### Technical Architecture
+
+#### Contract Interaction Map
+
+```mermaid
+graph TB
+    F[Factory] --> H[Hook]
+    F --> L[LP Locker]
+    F --> FL[Fee Locker]
+    F --> E[Extensions]
+    H --> PM[Pool Manager]
+    H --> FL
+    L --> PM
+    L --> FL
+    E --> F
+    E --> PM
+    
+    subgraph "Uniswap V4"
+        PM[Pool Manager]
+        P[Pools]
+        PM --> P
+    end
+    
+    subgraph "FEY Protocol"
+        F
+        H
+        L
+        FL
+        E
+    end
+```
+
+#### Key Design Principles
+
+**Permissionless Operations**
+
+* No governance required for core functions
+* Automatic fee distribution via smart contracts
+* Public functions for system maintenance
+
+**Modular Architecture**
+
+* Extensible through approved extensions
+* Swappable components (lockers, MEV modules)
+* Clean separation of concerns
+
+**Uniswap V4 Native**
+
+* Built specifically for V4's hook system
+* Leverages dynamic fees and advanced pool features
+* Designed for V4's gas efficiency improvements
+
+**Security First**
+
+* Multiple layers of access controls
+* Freeze mechanisms for critical parameters
+* Capped fees and MEV protection limits
+
+### Integration Points
+
+#### For Users
+
+**Token Stakers**
+
+* Interface: Fee Locker contract
+* Action: Stake $FEY, claim accumulated fees
+* Rewards: Protocol fees from all network activity
+
+**Token Creators**
+
+* Interface: Factory contract
+* Action: Deploy tokens with configuration
+* Rewards: Creator fees in $FEY, LP rewards
+
+**Traders**
+
+* Interface: Uniswap V4 pools
+* Action: Swap tokens, provide liquidity
+* Benefits: MEV protection, dynamic fees
+
+#### For Developers
+
+**Extension Builders**
+
+* Interface: IFeyExtension interface
+* Integration: Allowlist approval process
+* Capabilities: Custom deployment logic
+
+**Frontend Developers**
+
+* Interface: Factory and Hook contracts
+* Queries: Token info, pool state, fees
+* Actions: Deployment, trading, staking
+
+**Protocol Integrators**
+
+* Interface: All contract ABIs
+* Monitoring: Event tracking, fee collection
+* Automation: Reward triggers, buybacks
+
+***
+
+### Next Steps
+
+Explore specific components:
+
+* **Token Mechanics**: [Tokenomics →](/architecture/tokenomics)
+* **Contract Details**: [Contract Map →](/architecture/contracts)
+* **Fee System**: [Fee Distribution →](/architecture/fees)
+* **Core Contracts**: [Factory Contract →](/contracts/factory)
+
+
+## Tokenomics
+
+This page explains the token economics and mechanisms of the Fey protocol.
+
+### Coming Soon
+
+Detailed tokenomics documentation will be available here.
+

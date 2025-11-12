@@ -1,0 +1,295 @@
+# Factory Contract
+
+The Factory is the central orchestrator of the FEY Protocol, responsible for token deployment, system configuration, and fee management.
+
+**Contract Address**: `0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d`
+
+## Overview
+
+The Factory contract serves as the entry point for token deployments and the control center for protocol-wide settings. It coordinates with all other system components to create a seamless deployment and fee distribution experience.
+
+### Key Responsibilities
+
+- **Token Deployment**: Creates new FEY-compatible tokens with 100B supply
+- **Pool Initialization**: Sets up Uniswap V4 pools with hooks and configuration
+- **System Configuration**: Manages enabled modules (hooks, lockers, extensions, MEV)
+- **Fee Routing**: Routes WETH and FEY fees to appropriate destinations
+- **Access Control**: Owner/admin/bootstrap role management
+
+## Core Functions
+
+### Token Deployment
+
+```solidity
+function deployToken(DeploymentConfig memory deploymentConfig) 
+    public payable nonReentrant 
+    returns (address tokenAddress)
+```
+
+The main function for creating new tokens. Requires comprehensive configuration and can include ETH for extensions.
+
+**Parameters:**
+- `deploymentConfig`: Complete deployment configuration including token metadata, pool settings, liquidity config, and extensions
+
+**Returns:**
+- `tokenAddress`: Address of the newly created token
+
+**Process:**
+1. Validates deployment is allowed (not deprecated, or using bootstrap)
+2. Creates token via `FeyDeployer.deployToken()` 
+3. Initializes pool through hook contract
+4. Sets up liquidity positions via locker
+5. Executes extensions (dev buys, etc.)
+6. Enables MEV protection
+7. Stores deployment info for tracking
+
+### Fee Management
+
+```solidity
+function claimWethFees() external nonReentrant
+function claimBaseTokenFees() external nonReentrant
+```
+
+Public functions for routing accumulated fees to their destinations.
+
+**claimWethFees:**
+- Transfers all WETH balance to `teamFeeRecipient`
+- Used for manual buyback process
+- Can be called by anyone
+
+**claimBaseTokenFees:**
+- Routes FEY fees to `feeLocker` (if set) or `teamFeeRecipient`
+- Automatic storage for staker distribution
+- Can be called by anyone
+
+### System Configuration
+
+```solidity
+function setBaseToken(address baseToken_) external onlyOwnerAdminOrBootstrap
+function setHook(address hook, bool enabled) external onlyOwnerAdminOrBootstrap
+function setLocker(address locker, address hook, bool enabled) external onlyOwnerAdminOrBootstrap
+function setExtension(address extension, bool enabled) external onlyOwnerAdminOrBootstrap
+function setMevModule(address mevModule, bool enabled) external onlyOwnerAdminOrBootstrap
+```
+
+Administrative functions for configuring protocol modules.
+
+**Access Control:**
+- `onlyOwnerAdminOrBootstrap`: Owner, admin, or bootstrap can call
+- Bootstrap permissions can be released permanently
+- Some settings can be frozen permanently
+
+## State Variables
+
+### Core Configuration
+
+```solidity
+address public baseToken;           // FEY token address (0xD09...91D)
+bool public deprecated;             // Blocks new deployments if true  
+address public teamFeeRecipient;    // Receives fees (0x72f...d8C50)
+address public feeLocker;          // Stores fees for stakers
+address public bootstrap;          // Bootstrap permissions
+bool public freezeFeeRecipient;    // Locks fee recipient if true
+bool public feeLockerFrozen;      // Locks fee locker if true
+```
+
+### Module Registries
+
+```solidity
+mapping(address hook => bool enabled) enabledHooks;
+mapping(address locker => mapping(address hook => bool enabled)) enabledLockers;
+mapping(address extension => bool enabled) enabledExtensions;
+mapping(address mevModule => bool enabled) enabledMevModules;
+```
+
+### Deployment Tracking
+
+```solidity
+mapping(address token => DeploymentInfo) deploymentInfoForToken;
+```
+
+Stores complete deployment information for each token created through the factory.
+
+## Data Structures
+
+### DeploymentConfig
+
+```solidity
+struct DeploymentConfig {
+    TokenConfig tokenConfig;
+    PoolConfig poolConfig;
+    LockerConfig lockerConfig;
+    MevModuleConfig mevModuleConfig;
+    ExtensionConfig[] extensionConfigs;
+}
+```
+
+### TokenConfig
+
+```solidity
+struct TokenConfig {
+    string name;                    // Token name
+    string symbol;                  // Token symbol
+    string image;                   // Image URL
+    string metadata;               // Metadata URL
+    string context;                // Additional context
+    address tokenAdmin;            // Token admin address
+    uint256 salt;                  // CREATE2 salt
+    uint256 originatingChainId;    // Chain where token originates
+}
+```
+
+### DeploymentInfo
+
+```solidity
+struct DeploymentInfo {
+    address locker;        // LP position manager
+    address token;         // Token address
+    address hook;          // Pool hook
+    address[] extensions;  // Used extensions
+}
+```
+
+## Access Control
+
+### Role Hierarchy
+
+**Owner** (Highest privileges)
+- Set all system parameters
+- Freeze critical settings
+- Manage admin roles
+
+**Admin** 
+- Configure modules and extensions
+- Manage non-critical settings
+- Trigger fee claims
+
+**Bootstrap**
+- Special role for initial setup
+- Can be permanently released
+- Required for initial base token setting
+
+### Security Features
+
+```solidity
+function freezeTeamFeeRecipient() external onlyOwner
+function freezeFeeLocker() external onlyOwner
+```
+
+Permanent freeze mechanisms for critical addresses:
+- Once frozen, addresses cannot be changed
+- Provides security guarantees for users
+- Irreversible protection against malicious changes
+
+## Events
+
+### Token Creation
+
+```solidity
+event TokenCreated(
+    address indexed msgSender,
+    address indexed tokenAddress,
+    address indexed tokenAdmin,
+    string tokenMetadata,
+    string tokenImage,
+    string tokenName,
+    string tokenSymbol,
+    string tokenContext,
+    address poolHook,
+    PoolId poolId,
+    int24 startingTick,
+    address pairedToken,
+    address locker,
+    address mevModule,
+    uint256 extensionsSupply,
+    address[] extensions
+);
+```
+
+### System Configuration
+
+```solidity
+event SetHook(address indexed hook, bool enabled);
+event SetLocker(address indexed locker, address indexed hook, bool enabled);
+event SetExtension(address indexed extension, bool enabled);
+event SetMevModule(address indexed mevModule, bool enabled);
+```
+
+### Fee Management
+
+```solidity
+event ClaimFees(address indexed token, address indexed recipient, uint256 amount);
+event ExtensionTriggered(address indexed extension, uint256 tokenAmount, uint256 ethAmount);
+```
+
+## Usage Examples
+
+### Query Token Deployment Info
+
+```javascript
+// Get deployment details for FEY token
+const deploymentInfo = await factory.tokenDeploymentInfo(
+  "0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D"
+);
+console.log("Locker:", deploymentInfo.locker);
+console.log("Hook:", deploymentInfo.hook);
+console.log("Extensions:", deploymentInfo.extensions);
+```
+
+### Check System Status
+
+```javascript
+// Verify factory configuration
+const isDeprecated = await factory.deprecated();
+const baseToken = await factory.baseToken();
+const teamRecipient = await factory.teamFeeRecipient();
+
+console.log("Factory deprecated:", isDeprecated);
+console.log("Base token:", baseToken);
+console.log("Team recipient:", teamRecipient);
+```
+
+### Monitor Fee Claims
+
+```javascript
+// Listen for fee claim events
+factory.on("ClaimFees", (token, recipient, amount, event) => {
+  console.log(`Fees claimed: ${amount} of ${token} to ${recipient}`);
+});
+```
+
+## Integration Notes
+
+### For Frontend Developers
+
+**Token Deployment Interface:**
+1. Collect deployment configuration from user
+2. Prepare extension configurations (dev buy amounts, etc.)
+3. Call `deployToken()` with appropriate ETH value
+4. Monitor `TokenCreated` event for deployment confirmation
+
+**Fee Monitoring:**
+1. Track fee accumulation in factory
+2. Provide UI for triggering fee claims
+3. Show real-time protocol revenue
+
+### For Protocol Integrators
+
+**Module Integration:**
+1. Implement required interfaces (IFeyExtension, IFeyLpLocker, etc.)
+2. Get module approved via admin functions
+3. Test integration with deployment flow
+
+**State Monitoring:**
+1. Monitor deployment events for new tokens
+2. Track fee flows and distributions
+3. Query deployment info for analytics
+
+---
+
+## Related Documentation
+
+- **Hook System**: [Hook Contract →](/contracts/hook)
+- **Token Details**: [FEY Token →](/contracts/token)
+- **Deployment Flow**: [Token Deployment →](/flows/deployment)
+- **Fee System**: [Fee Distribution →](/architecture/fees)

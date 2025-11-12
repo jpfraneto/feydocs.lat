@@ -1,0 +1,856 @@
+# Integration Guide
+
+Learn how to integrate FEY Protocol into your application, from basic queries to full deployment interfaces.
+
+## Quick Start
+
+### Installation
+
+```bash
+# Using npm
+npm install ethers viem
+
+# Using yarn  
+yarn add ethers viem
+
+# Using pnpm
+pnpm add ethers viem
+```
+
+### Basic Setup
+
+```typescript
+import { ethers } from 'ethers';
+import { createPublicClient, http } from 'viem';
+import { base } from 'viem/chains';
+
+// Provider setup
+const provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
+
+// Viem client
+const publicClient = createPublicClient({
+  chain: base,
+  transport: http('https://mainnet.base.org')
+});
+
+// Contract addresses
+export const CONTRACTS = {
+  factory: '0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d',
+  feyToken: '0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D',
+  hook: '0x5B409184204b86f708d3aeBb3cad3F02835f68cC',
+  feeLocker: '0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6',
+  lpLocker: '0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa',
+} as const;
+```
+
+## Core Integration Patterns
+
+### 1. Protocol State Queries
+
+```typescript
+import { factoryABI, feyTokenABI, hookABI } from './abis';
+
+class FeyProtocolClient {
+  private provider: ethers.Provider;
+  private contracts: Record<string, ethers.Contract>;
+
+  constructor(provider: ethers.Provider) {
+    this.provider = provider;
+    this.contracts = {
+      factory: new ethers.Contract(CONTRACTS.factory, factoryABI, provider),
+      feyToken: new ethers.Contract(CONTRACTS.feyToken, feyTokenABI, provider),
+      hook: new ethers.Contract(CONTRACTS.hook, hookABI, provider),
+    };
+  }
+
+  // Get protocol status
+  async getProtocolStatus() {
+    const [deprecated, baseToken, totalSupply, teamFeeRecipient] = await Promise.all([
+      this.contracts.factory.deprecated(),
+      this.contracts.factory.baseToken(),
+      this.contracts.feyToken.totalSupply(),
+      this.contracts.factory.teamFeeRecipient(),
+    ]);
+
+    return {
+      deprecated,
+      baseToken,
+      totalSupply: totalSupply.toString(),
+      teamFeeRecipient,
+      protocolReady: !deprecated && baseToken !== ethers.ZeroAddress,
+    };
+  }
+
+  // Get token deployment information
+  async getTokenInfo(tokenAddress: string) {
+    try {
+      const deploymentInfo = await this.contracts.factory.tokenDeploymentInfo(tokenAddress);
+      const tokenContract = new ethers.Contract(tokenAddress, feyTokenABI, this.provider);
+      
+      const [name, symbol, decimals, totalSupply, metadata] = await Promise.all([
+        tokenContract.name(),
+        tokenContract.symbol(),
+        tokenContract.decimals(),
+        tokenContract.totalSupply(),
+        tokenContract.allData(),
+      ]);
+
+      return {
+        address: tokenAddress,
+        name,
+        symbol,
+        decimals,
+        totalSupply: totalSupply.toString(),
+        deploymentInfo: {
+          locker: deploymentInfo.locker,
+          hook: deploymentInfo.hook,
+          extensions: deploymentInfo.extensions,
+        },
+        metadata: {
+          originalAdmin: metadata[0],
+          admin: metadata[1],
+          image: metadata[2],
+          metadata: metadata[3],
+          context: metadata[4],
+        },
+        deployedThroughFey: deploymentInfo.locker !== ethers.ZeroAddress,
+      };
+    } catch (error) {
+      throw new Error(`Failed to get token info: ${error.message}`);
+    }
+  }
+
+  // Get fee information for an address
+  async getFeeInfo(feeOwner: string, tokenAddress: string) {
+    const feeLocker = new ethers.Contract(CONTRACTS.feeLocker, feeLockerABI, this.provider);
+    const availableFees = await feeLocker.availableFees(feeOwner, tokenAddress);
+    
+    return {
+      feeOwner,
+      token: tokenAddress,
+      availableFees: availableFees.toString(),
+      hasClaimableFees: availableFees > 0n,
+    };
+  }
+}
+```
+
+### 2. Token Deployment Interface
+
+```typescript
+interface DeploymentConfig {
+  tokenConfig: {
+    name: string;
+    symbol: string;
+    image: string;
+    metadata: string;
+    context: string;
+    tokenAdmin: string;
+    salt: string;
+    originatingChainId: number;
+  };
+  poolConfig: {
+    hook: string;
+    pairedToken: string;
+    tickIfToken0IsFey: number;
+    tickSpacing: number;
+    poolData: string;
+  };
+  lockerConfig: {
+    locker: string;
+    tickLower: number[];
+    tickUpper: number[];
+    positionBps: number[];
+    rewardBps: number[];
+    rewardAdmins: string[];
+    rewardRecipients: string[];
+  };
+  mevModuleConfig: {
+    mevModule: string;
+    mevModuleData: string;
+  };
+  extensionConfigs: {
+    extension: string;
+    extensionBps: number;
+    msgValue: string;
+    extensionData: string;
+  }[];
+}
+
+class FeyDeploymentService {
+  private signer: ethers.Signer;
+  private factory: ethers.Contract;
+
+  constructor(signer: ethers.Signer) {
+    this.signer = signer;
+    this.factory = new ethers.Contract(CONTRACTS.factory, factoryABI, signer);
+  }
+
+  // Create a basic deployment configuration
+  createBasicConfig(params: {
+    name: string;
+    symbol: string;
+    image?: string;
+    metadata?: string;
+    context?: string;
+    rewardRecipient: string;
+    devBuyAmount?: string; // ETH amount
+  }): DeploymentConfig {
+    return {
+      tokenConfig: {
+        name: params.name,
+        symbol: params.symbol,
+        image: params.image || '',
+        metadata: params.metadata || '',
+        context: params.context || '',
+        tokenAdmin: params.rewardRecipient,
+        salt: ethers.hexlify(ethers.randomBytes(32)),
+        originatingChainId: 8453, // Base mainnet
+      },
+      poolConfig: {
+        hook: CONTRACTS.hook,
+        pairedToken: ethers.ZeroAddress, // Will be overridden to FEY
+        tickIfToken0IsFey: -276326, // Starting price tick
+        tickSpacing: 200,
+        poolData: this.encodePoolData({
+          extension: params.devBuyAmount ? '0x173077c319c38bb08D4C4968014357fd518446b4' : ethers.ZeroAddress,
+          extensionData: '0x',
+          feeData: ethers.AbiCoder.defaultAbiCoder().encode(
+            ['uint24', 'uint24'], 
+            [3000, 3000] // 0.3% fees both directions
+          ),
+        }),
+      },
+      lockerConfig: {
+        locker: CONTRACTS.lpLocker,
+        tickLower: [-887272], // Full range
+        tickUpper: [887272],
+        positionBps: [10000], // 100% to single position
+        rewardBps: [10000], // 100% to single recipient
+        rewardAdmins: [params.rewardRecipient],
+        rewardRecipients: [params.rewardRecipient],
+      },
+      mevModuleConfig: {
+        mevModule: '0x2ebc0fA629b268dFA3d455b67027d507a562EAC0', // Noop module
+        mevModuleData: '0x',
+      },
+      extensionConfigs: params.devBuyAmount ? [{
+        extension: '0x173077c319c38bb08D4C4968014357fd518446b4',
+        extensionBps: 0, // No token allocation for dev buy
+        msgValue: ethers.parseEther(params.devBuyAmount).toString(),
+        extensionData: this.encodeDevBuyData(params.rewardRecipient),
+      }] : [],
+    };
+  }
+
+  // Deploy token with configuration
+  async deployToken(config: DeploymentConfig, options?: {
+    gasLimit?: number;
+    onProgress?: (step: string) => void;
+  }) {
+    const { onProgress } = options || {};
+    
+    try {
+      onProgress?.('Validating configuration...');
+      this.validateConfig(config);
+
+      onProgress?.('Calculating ETH requirements...');
+      const totalEthRequired = config.extensionConfigs.reduce(
+        (sum, ext) => sum + BigInt(ext.msgValue),
+        0n
+      );
+
+      onProgress?.('Submitting deployment transaction...');
+      const tx = await this.factory.deployToken(config, {
+        value: totalEthRequired,
+        gasLimit: options?.gasLimit || 5_000_000,
+      });
+
+      onProgress?.('Waiting for confirmation...');
+      const receipt = await tx.wait();
+
+      onProgress?.('Extracting token address...');
+      const tokenCreatedEvent = receipt.logs.find(log => {
+        try {
+          const parsed = this.factory.interface.parseLog(log);
+          return parsed?.name === 'TokenCreated';
+        } catch {
+          return false;
+        }
+      });
+
+      if (!tokenCreatedEvent) {
+        throw new Error('TokenCreated event not found');
+      }
+
+      const parsedEvent = this.factory.interface.parseLog(tokenCreatedEvent);
+      const tokenAddress = parsedEvent.args.tokenAddress;
+
+      onProgress?.('Deployment completed!');
+      
+      return {
+        tokenAddress,
+        transactionHash: tx.hash,
+        blockNumber: receipt.blockNumber,
+        gasUsed: receipt.gasUsed.toString(),
+        events: this.parseDeploymentEvents(receipt),
+      };
+
+    } catch (error) {
+      throw new Error(`Deployment failed: ${error.message}`);
+    }
+  }
+
+  private encodePoolData(params: {
+    extension: string;
+    extensionData: string;
+    feeData: string;
+  }) {
+    return ethers.AbiCoder.defaultAbiCoder().encode(
+      ['address', 'bytes', 'bytes'],
+      [params.extension, params.extensionData, params.feeData]
+    );
+  }
+
+  private encodeDevBuyData(recipient: string) {
+    // Encode dev buy extension data
+    const feyWethPoolKey = {
+      currency0: '0x4200000000000000000000000000000000000006', // WETH
+      currency1: CONTRACTS.feyToken,
+      fee: 0x800000, // Dynamic fee flag
+      tickSpacing: 200,
+      hooks: CONTRACTS.hook,
+    };
+
+    return ethers.AbiCoder.defaultAbiCoder().encode(
+      ['address', 'tuple(address,address,uint24,int24,address)', 'uint128'],
+      [recipient, Object.values(feyWethPoolKey), 1] // Minimum 1 wei output
+    );
+  }
+
+  private validateConfig(config: DeploymentConfig) {
+    // Validate reward BPS sum to 10000
+    const totalRewardBps = config.lockerConfig.rewardBps.reduce((sum, bps) => sum + bps, 0);
+    if (totalRewardBps !== 10000) {
+      throw new Error(`Reward BPS must sum to 10000, got ${totalRewardBps}`);
+    }
+
+    // Validate position BPS sum to 10000
+    const totalPositionBps = config.lockerConfig.positionBps.reduce((sum, bps) => sum + bps, 0);
+    if (totalPositionBps !== 10000) {
+      throw new Error(`Position BPS must sum to 10000, got ${totalPositionBps}`);
+    }
+
+    // Validate array lengths match
+    const { rewardBps, rewardAdmins, rewardRecipients } = config.lockerConfig;
+    if (rewardBps.length !== rewardAdmins.length || rewardBps.length !== rewardRecipients.length) {
+      throw new Error('Reward arrays must have matching lengths');
+    }
+
+    // Validate tick configuration
+    const { tickLower, tickUpper, positionBps } = config.lockerConfig;
+    if (tickLower.length !== tickUpper.length || tickLower.length !== positionBps.length) {
+      throw new Error('Position arrays must have matching lengths');
+    }
+  }
+
+  private parseDeploymentEvents(receipt: ethers.TransactionReceipt) {
+    const events = [];
+    for (const log of receipt.logs) {
+      try {
+        const parsed = this.factory.interface.parseLog(log);
+        if (parsed) events.push(parsed);
+      } catch {
+        // Skip unparseable logs
+      }
+    }
+    return events;
+  }
+}
+```
+
+### 3. Real-time Monitoring
+
+```typescript
+class FeyMonitoringService {
+  private provider: ethers.Provider;
+  private contracts: Record<string, ethers.Contract>;
+  private eventListeners: Map<string, () => void> = new Map();
+
+  constructor(provider: ethers.Provider) {
+    this.provider = provider;
+    this.contracts = {
+      factory: new ethers.Contract(CONTRACTS.factory, factoryABI, provider),
+      feyToken: new ethers.Contract(CONTRACTS.feyToken, feyTokenABI, provider),
+    };
+  }
+
+  // Monitor new token deployments
+  onTokenCreated(callback: (event: any) => void) {
+    const listener = this.contracts.factory.on('TokenCreated', (...args) => {
+      const event = args[args.length - 1]; // Last arg is the event
+      callback({
+        tokenAddress: args[1],
+        creator: args[0],
+        name: args[5],
+        symbol: args[6],
+        transactionHash: event.transactionHash,
+        blockNumber: event.blockNumber,
+      });
+    });
+
+    this.eventListeners.set('tokenCreated', () => {
+      this.contracts.factory.off('TokenCreated', listener);
+    });
+  }
+
+  // Monitor fee claims
+  onFeeClaimed(callback: (event: any) => void) {
+    const listener = this.contracts.factory.on('ClaimFees', (token, recipient, amount, event) => {
+      callback({
+        token,
+        recipient,
+        amount: amount.toString(),
+        transactionHash: event.transactionHash,
+        blockNumber: event.blockNumber,
+      });
+    });
+
+    this.eventListeners.set('feeClaimed', () => {
+      this.contracts.factory.off('ClaimFees', listener);
+    });
+  }
+
+  // Monitor token transfers (for volume tracking)
+  onTokenTransfer(tokenAddress: string, callback: (event: any) => void) {
+    const tokenContract = new ethers.Contract(tokenAddress, feyTokenABI, this.provider);
+    
+    const listener = tokenContract.on('Transfer', (from, to, amount, event) => {
+      callback({
+        from,
+        to,
+        amount: amount.toString(),
+        token: tokenAddress,
+        transactionHash: event.transactionHash,
+        blockNumber: event.blockNumber,
+      });
+    });
+
+    this.eventListeners.set(`transfer-${tokenAddress}`, () => {
+      tokenContract.off('Transfer', listener);
+    });
+  }
+
+  // Get historical events
+  async getTokenCreationHistory(fromBlock: number = 0) {
+    const filter = this.contracts.factory.filters.TokenCreated();
+    const events = await this.contracts.factory.queryFilter(filter, fromBlock);
+    
+    return events.map(event => ({
+      tokenAddress: event.args.tokenAddress,
+      creator: event.args.msgSender,
+      name: event.args.tokenName,
+      symbol: event.args.tokenSymbol,
+      blockNumber: event.blockNumber,
+      transactionHash: event.transactionHash,
+    }));
+  }
+
+  // Clean up all listeners
+  cleanup() {
+    for (const cleanup of this.eventListeners.values()) {
+      cleanup();
+    }
+    this.eventListeners.clear();
+  }
+}
+```
+
+## React Integration
+
+### Custom Hooks
+
+```typescript
+// hooks/useFeyProtocol.ts
+import { useState, useEffect } from 'react';
+import { useProvider } from 'wagmi';
+
+export function useFeyProtocol() {
+  const provider = useProvider();
+  const [protocolStatus, setProtocolStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const client = new FeyProtocolClient(provider);
+    
+    client.getProtocolStatus()
+      .then(setProtocolStatus)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [provider]);
+
+  return { protocolStatus, loading };
+}
+
+export function useTokenInfo(tokenAddress?: string) {
+  const provider = useProvider();
+  const [tokenInfo, setTokenInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!tokenAddress) return;
+
+    setLoading(true);
+    const client = new FeyProtocolClient(provider);
+    
+    client.getTokenInfo(tokenAddress)
+      .then(setTokenInfo)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [provider, tokenAddress]);
+
+  return { tokenInfo, loading };
+}
+
+export function useRealtimeEvents() {
+  const provider = useProvider();
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const monitor = new FeyMonitoringService(provider);
+    
+    monitor.onTokenCreated((event) => {
+      setEvents(prev => [event, ...prev].slice(0, 100)); // Keep last 100 events
+    });
+
+    monitor.onFeeClaimed((event) => {
+      setEvents(prev => [event, ...prev].slice(0, 100));
+    });
+
+    return () => monitor.cleanup();
+  }, [provider]);
+
+  return events;
+}
+```
+
+### Component Examples
+
+```tsx
+// components/ProtocolStatus.tsx
+import { useFeyProtocol } from '../hooks/useFeyProtocol';
+
+export function ProtocolStatus() {
+  const { protocolStatus, loading } = useFeyProtocol();
+
+  if (loading) return <div>Loading...</div>;
+
+  return (
+    <div className="protocol-status">
+      <h2>FEY Protocol Status</h2>
+      <div className={`status-indicator ${protocolStatus?.protocolReady ? 'ready' : 'not-ready'}`}>
+        {protocolStatus?.protocolReady ? '🟢 Protocol Ready' : '🔴 Protocol Not Ready'}
+      </div>
+      
+      <div className="details">
+        <p><strong>Base Token:</strong> {protocolStatus?.baseToken}</p>
+        <p><strong>Total Supply:</strong> {protocolStatus?.totalSupply}</p>
+        <p><strong>Deprecated:</strong> {protocolStatus?.deprecated ? 'Yes' : 'No'}</p>
+      </div>
+    </div>
+  );
+}
+
+// components/TokenDeploymentForm.tsx
+import { useState } from 'react';
+import { useSigner } from 'wagmi';
+import { FeyDeploymentService } from '../services/deployment';
+
+export function TokenDeploymentForm() {
+  const { data: signer } = useSigner();
+  const [formData, setFormData] = useState({
+    name: '',
+    symbol: '',
+    devBuyAmount: '0',
+  });
+  const [deploying, setDeploying] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!signer) return;
+
+    setDeploying(true);
+    try {
+      const service = new FeyDeploymentService(signer);
+      const config = service.createBasicConfig({
+        ...formData,
+        rewardRecipient: await signer.getAddress(),
+      });
+
+      const result = await service.deployToken(config, {
+        onProgress: (step) => console.log(step),
+      });
+
+      setResult(result);
+    } catch (error) {
+      console.error('Deployment failed:', error);
+    } finally {
+      setDeploying(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="deployment-form">
+      <div>
+        <label>Token Name:</label>
+        <input
+          value={formData.name}
+          onChange={(e) => setFormData({...formData, name: e.target.value})}
+          required
+        />
+      </div>
+      
+      <div>
+        <label>Symbol:</label>
+        <input
+          value={formData.symbol}
+          onChange={(e) => setFormData({...formData, symbol: e.target.value})}
+          required
+        />
+      </div>
+      
+      <div>
+        <label>Dev Buy Amount (ETH):</label>
+        <input
+          type="number"
+          step="0.01"
+          value={formData.devBuyAmount}
+          onChange={(e) => setFormData({...formData, devBuyAmount: e.target.value})}
+        />
+      </div>
+
+      <button type="submit" disabled={deploying || !signer}>
+        {deploying ? 'Deploying...' : 'Deploy Token'}
+      </button>
+
+      {result && (
+        <div className="deployment-result">
+          <h3>Deployment Successful!</h3>
+          <p><strong>Token Address:</strong> {result.tokenAddress}</p>
+          <p><strong>Transaction:</strong> {result.transactionHash}</p>
+        </div>
+      )}
+    </form>
+  );
+}
+```
+
+## Testing Integration
+
+### Unit Tests
+
+```typescript
+// tests/integration.test.ts
+import { describe, it, expect, beforeEach } from 'vitest';
+import { ethers } from 'ethers';
+import { FeyProtocolClient } from '../src/client';
+
+describe('FEY Protocol Integration', () => {
+  let client: FeyProtocolClient;
+  let provider: ethers.Provider;
+
+  beforeEach(() => {
+    provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
+    client = new FeyProtocolClient(provider);
+  });
+
+  it('should get protocol status', async () => {
+    const status = await client.getProtocolStatus();
+    
+    expect(status).toHaveProperty('deprecated');
+    expect(status).toHaveProperty('baseToken');
+    expect(status).toHaveProperty('totalSupply');
+    expect(status.baseToken).toBe(CONTRACTS.feyToken);
+  });
+
+  it('should get FEY token information', async () => {
+    const tokenInfo = await client.getTokenInfo(CONTRACTS.feyToken);
+    
+    expect(tokenInfo.name).toBe('FEY');
+    expect(tokenInfo.symbol).toBe('FEY');
+    expect(tokenInfo.decimals).toBe(18);
+    expect(tokenInfo.deployedThroughFey).toBe(true);
+  });
+
+  it('should validate deployment config', () => {
+    const service = new FeyDeploymentService(mockSigner);
+    
+    expect(() => {
+      service['validateConfig']({
+        lockerConfig: {
+          rewardBps: [5000, 4000], // Only sums to 9000
+          rewardAdmins: ['0x1', '0x2'],
+          rewardRecipients: ['0x1', '0x2'],
+          positionBps: [10000],
+          tickLower: [-100],
+          tickUpper: [100],
+        },
+      } as any);
+    }).toThrow('Reward BPS must sum to 10000');
+  });
+});
+```
+
+### Integration Tests
+
+```typescript
+// tests/e2e.test.ts
+import { describe, it, expect } from 'vitest';
+import { ethers } from 'ethers';
+
+describe('End-to-End Integration', () => {
+  // Note: These tests require a funded test wallet and should run on testnet
+  
+  it('should deploy a token end-to-end', async () => {
+    // This would be a comprehensive test of the entire deployment flow
+    // Requires testnet environment and funded wallet
+  });
+  
+  it('should monitor events correctly', async () => {
+    // Test event monitoring functionality
+  });
+});
+```
+
+## Error Handling
+
+### Common Error Patterns
+
+```typescript
+export class FeyIntegrationError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public details?: any
+  ) {
+    super(message);
+    this.name = 'FeyIntegrationError';
+  }
+}
+
+export function handleContractError(error: any): never {
+  // Parse common contract errors
+  if (error.code === 'CALL_EXCEPTION') {
+    if (error.reason?.includes('Deprecated')) {
+      throw new FeyIntegrationError(
+        'Factory is currently deprecated',
+        'FACTORY_DEPRECATED'
+      );
+    }
+    
+    if (error.reason?.includes('BaseTokenNotSet')) {
+      throw new FeyIntegrationError(
+        'Protocol not fully initialized',
+        'PROTOCOL_NOT_READY'
+      );
+    }
+  }
+
+  if (error.code === 'INSUFFICIENT_FUNDS') {
+    throw new FeyIntegrationError(
+      'Insufficient ETH for deployment',
+      'INSUFFICIENT_FUNDS',
+      { required: error.value, available: error.balance }
+    );
+  }
+
+  // Generic error
+  throw new FeyIntegrationError(
+    `Contract interaction failed: ${error.message}`,
+    'CONTRACT_ERROR',
+    error
+  );
+}
+
+// Usage in methods
+async getTokenInfo(tokenAddress: string) {
+  try {
+    // ... contract calls
+  } catch (error) {
+    handleContractError(error);
+  }
+}
+```
+
+## Best Practices
+
+### Performance Optimization
+
+```typescript
+// Use multicall for batch queries
+import { multicall } from '@wagmi/core';
+
+async function batchTokenQueries(tokenAddresses: string[]) {
+  const calls = tokenAddresses.flatMap(address => [
+    {
+      address: address as `0x${string}`,
+      abi: feyTokenABI,
+      functionName: 'name',
+    },
+    {
+      address: address as `0x${string}`,
+      abi: feyTokenABI,
+      functionName: 'symbol',
+    },
+    {
+      address: CONTRACTS.factory as `0x${string}`,
+      abi: factoryABI,
+      functionName: 'tokenDeploymentInfo',
+      args: [address],
+    },
+  ]);
+
+  const results = await multicall({ contracts: calls });
+  
+  // Process batched results
+  return tokenAddresses.map((address, i) => ({
+    address,
+    name: results[i * 3]?.result,
+    symbol: results[i * 3 + 1]?.result,
+    deploymentInfo: results[i * 3 + 2]?.result,
+  }));
+}
+```
+
+### Caching Strategy
+
+```typescript
+class CachedFeyClient extends FeyProtocolClient {
+  private cache = new Map<string, { data: any; timestamp: number }>();
+  private readonly CACHE_TTL = 60000; // 1 minute
+
+  async getTokenInfo(tokenAddress: string) {
+    const cacheKey = `token-${tokenAddress}`;
+    const cached = this.cache.get(cacheKey);
+    
+    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+      return cached.data;
+    }
+
+    const data = await super.getTokenInfo(tokenAddress);
+    this.cache.set(cacheKey, { data, timestamp: Date.now() });
+    
+    return data;
+  }
+}
+```
+
+---
+
+## Related Documentation
+
+- **Contract Addresses**: [Reference →](/reference/addresses)
+- **Cast Commands**: [Command Reference →](/guides/cast-commands)
+- **Token Deployment**: [Deployment Guide →](/flows/deployment)
+- **Troubleshooting**: [Support →](/support/troubleshooting)

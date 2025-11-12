@@ -1,0 +1,4 @@
+import{u as r,j as e}from"./index-B_EWvgIS.js";const a={title:"Queries",description:"undefined"};function t(i){const n={a:"a",div:"div",h1:"h1",h2:"h2",header:"header",p:"p",...r(),...i.components};return e.jsxs(e.Fragment,{children:[e.jsx(n.header,{children:e.jsxs(n.h1,{id:"queries",children:["Queries",e.jsx(n.a,{"aria-hidden":"true",tabIndex:"-1",href:"#queries",children:e.jsx(n.div,{"data-autolink-icon":!0})})]})}),`
+`,e.jsx(n.p,{children:"This page provides guidance on querying the Fey protocol."}),`
+`,e.jsxs(n.h2,{id:"coming-soon",children:["Coming Soon",e.jsx(n.a,{"aria-hidden":"true",tabIndex:"-1",href:"#coming-soon",children:e.jsx(n.div,{"data-autolink-icon":!0})})]}),`
+`,e.jsx(n.p,{children:"Detailed query documentation will be available here."})]})}function d(i={}){const{wrapper:n}={...r(),...i.components};return n?e.jsx(n,{...i,children:e.jsx(t,{...i})}):t(i)}export{d as default,a as frontmatter};

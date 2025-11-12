@@ -1,0 +1,6 @@
+{
+  "domain": "feydocs",
+  "buildCommand": "bun vocs build",
+  "buildDir": "docs/dist",
+  "siteId": "735fb478-5b02-494a-97e3-48ffbbd7b26e"
+}

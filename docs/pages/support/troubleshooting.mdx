@@ -1,0 +1,465 @@
+# Troubleshooting
+
+Common issues and solutions when working with FEY Protocol.
+
+## Deployment Issues
+
+### Factory Deprecated Error
+
+**Problem**: Getting "Deprecated" error when trying to deploy tokens.
+
+**Cause**: The factory is temporarily disabled for new deployments.
+
+**Solutions**:
+1. **Check factory status**:
+   ```bash
+   cast call $FACTORY "deprecated()(bool)" --rpc-url https://mainnet.base.org
+   ```
+
+2. **Wait for reactivation**: Factory may be temporarily disabled for upgrades
+
+3. **Bootstrap access**: If you have bootstrap permissions, you can still deploy
+
+4. **Check announcements**: Follow [@feyprotocol](https://twitter.com/feyprotocol) for status updates
+
+### Base Token Not Set
+
+**Problem**: Getting "BaseTokenNotSet" error.
+
+**Cause**: Protocol hasn't completed initial bootstrap process.
+
+**Diagnosis**:
+```bash
+# Check if base token is set
+cast call $FACTORY "baseToken()(address)" --rpc-url https://mainnet.base.org
+
+# Should return FEY token address: 0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D
+# If it returns 0x000...000, protocol isn't ready
+```
+
+**Solution**: Wait for protocol bootstrap completion or contact team.
+
+### Invalid Reward Configuration
+
+**Problem**: Deployment reverts with reward-related errors.
+
+**Common Causes**:
+
+1. **Reward BPS don't sum to 10000**:
+   ```typescript
+   // ❌ Wrong - sums to 9000
+   rewardBps: [5000, 4000]
+   
+   // ✅ Correct - sums to 10000  
+   rewardBps: [6000, 4000]
+   ```
+
+2. **Array length mismatch**:
+   ```typescript
+   // ❌ Wrong - different lengths
+   rewardBps: [5000, 5000],
+   rewardAdmins: ["0x1234"],  // Only 1 element
+   rewardRecipients: ["0x1234", "0x5678"]  // 2 elements
+   
+   // ✅ Correct - matching lengths
+   rewardBps: [5000, 5000],
+   rewardAdmins: ["0x1234", "0x5678"],
+   rewardRecipients: ["0x1234", "0x5678"]
+   ```
+
+3. **Position BPS don't sum to 10000**:
+   ```typescript
+   // ❌ Wrong
+   positionBps: [5000, 3000]  // Only 8000
+   
+   // ✅ Correct
+   positionBps: [7000, 3000]  // Equals 10000
+   ```
+
+### Extension Configuration Errors
+
+**Problem**: Extension-related deployment failures.
+
+**Diagnostics**:
+```bash
+# Check if extension is enabled
+cast call 0xFD549237CdEAbDc14438CAF3f3861e174fDEae46 \
+  "enabledExtensions(address)(bool)" [EXTENSION_ADDRESS] \
+  --rpc-url https://mainnet.base.org
+
+# Check dev buy extension specifically
+cast call 0xFD549237CdEAbDc14438CAF3f3861e174fDEae46 \
+  "enabledExtensions(address)(bool)" 0x173077c319c38bb08D4C4968014357fd518446b4 \
+  --rpc-url https://mainnet.base.org
+```
+
+**Common Fixes**:
+
+1. **Extension not enabled**: Contact team to add extension to allowlist
+
+2. **Invalid extension data**: Check data encoding:
+   ```typescript
+   // For dev buy extension
+   const extensionData = ethers.AbiCoder.defaultAbiCoder().encode(
+     ['address', 'tuple(address,address,uint24,int24,address)', 'uint128'],
+     [recipient, poolKey, minAmountOut]
+   );
+   ```
+
+3. **ETH amount mismatch**:
+   ```typescript
+   // Ensure ETH sent matches extension configs
+   const totalEth = extensionConfigs.reduce(
+     (sum, ext) => sum + BigInt(ext.msgValue),
+     0n
+   );
+   
+   // Send exactly this amount with deployment
+   await factory.deployToken(config, { value: totalEth });
+   ```
+
+### MEV Module Issues
+
+**Problem**: MEV module related errors during deployment.
+
+**Diagnostics**:
+```bash
+# Check if MEV module is enabled
+cast call $FACTORY "enabledMevModules(address)(bool)" \
+  0x2ebc0fA629b268dFA3d455b67027d507a562EAC0 \
+  --rpc-url https://mainnet.base.org
+```
+
+**Solutions**:
+1. Use the standard no-op MEV module: `0x2ebc0fA629b268dFA3d455b67027d507a562EAC0`
+2. Ensure MEV module data is properly encoded
+3. Contact team if you need custom MEV protection
+
+## Fee and Reward Issues
+
+### No Rewards Appearing
+
+**Problem**: Not receiving expected creator or staking rewards.
+
+**Diagnosis Steps**:
+
+1. **Check token reward configuration**:
+   ```bash
+   cast call $LP_LOCKER "tokenRewards(address)" [TOKEN_ADDRESS] --rpc-url https://mainnet.base.org
+   ```
+
+2. **Check if rewards collection is being triggered**:
+   ```bash
+   # Anyone can trigger this
+   cast send $LP_LOCKER "collectRewards(address)" [TOKEN_ADDRESS] \
+     --private-key $PRIVATE_KEY --rpc-url https://mainnet.base.org
+   ```
+
+3. **Check your available fees**:
+   ```bash
+   cast call $FEE_LOCKER \
+     "availableFees(address,address)(uint256)" \
+     [YOUR_ADDRESS] [TOKEN_ADDRESS] \
+     --rpc-url https://mainnet.base.org
+   ```
+
+**Common Causes**:
+- Rewards collection not being called regularly
+- Low trading volume (no fees generated)
+- Incorrect recipient address in deployment config
+
+### Fee Claims Failing
+
+**Problem**: Cannot claim fees from Fee Locker.
+
+**Diagnosis**:
+```bash
+# Check if you have fees to claim
+cast call $FEE_LOCKER \
+  "availableFees(address,address)(uint256)" \
+  [YOUR_ADDRESS] [TOKEN_ADDRESS] \
+  --rpc-url https://mainnet.base.org
+
+# Check if address is authorized (for vault claims)
+cast call $FEE_LOCKER "vault()(address)" --rpc-url https://mainnet.base.org
+```
+
+**Solutions**:
+1. **No fees available**: Wait for more trading activity or rewards distribution
+2. **Vault restrictions**: If claiming for vault address, must call from vault itself
+3. **Wrong token**: Ensure you're checking the correct token address
+
+### Protocol Fees Not Accumulating
+
+**Problem**: Expected protocol fees not reaching team recipient.
+
+**Diagnosis Flow**:
+
+1. **Check hook fee extraction**:
+   ```bash
+   # Verify hook is properly configured
+   cast call $HOOK "protocolFee()(uint24)" --rpc-url https://mainnet.base.org
+   ```
+
+2. **Check factory balances**:
+   ```bash
+   # Factory should accumulate fees temporarily
+   cast call $FEY_TOKEN "balanceOf(address)(uint256)" $FACTORY --rpc-url https://mainnet.base.org
+   cast call 0x4200000000000000000000000000000000000006 "balanceOf(address)(uint256)" $FACTORY --rpc-url https://mainnet.base.org
+   ```
+
+3. **Trigger fee claims**:
+   ```bash
+   # Anyone can call these
+   cast send $FACTORY "claimWethFees()" --private-key $PRIVATE_KEY --rpc-url https://mainnet.base.org
+   cast send $FACTORY "claimBaseTokenFees()" --private-key $PRIVATE_KEY --rpc-url https://mainnet.base.org
+   ```
+
+## Pool and Trading Issues
+
+### Pool Extensions Not Working
+
+**Problem**: Pool extensions not executing during swaps.
+
+**Diagnosis**:
+
+1. **Check extension registration**:
+   ```bash
+   cast call $HOOK "poolExtension(bytes32)(address)" [POOL_ID] --rpc-url https://mainnet.base.org
+   ```
+
+2. **Check if extension is set up**:
+   ```bash
+   cast call $HOOK "poolExtensionSetup(bytes32)(bool)" [POOL_ID] --rpc-url https://mainnet.base.org
+   ```
+
+3. **Verify allowlist**:
+   ```bash
+   cast call 0xFD549237CdEAbDc14438CAF3f3861e174fDEae46 \
+     "enabledExtensions(address)(bool)" [EXTENSION_ADDRESS] \
+     --rpc-url https://mainnet.base.org
+   ```
+
+**Solutions**:
+- Extensions only work for factory-deployed pools
+- Extensions don't execute when locker is the swap sender
+- Contact team if extension should be enabled but isn't
+
+### MEV Protection Issues
+
+**Problem**: MEV protection not working as expected.
+
+**Diagnosis**:
+```bash
+# Check MEV module status
+cast call $HOOK "mevModuleEnabled(bytes32)(bool)" [POOL_ID] --rpc-url https://mainnet.base.org
+
+# Check pool creation time
+cast call $HOOK "poolCreationTimestamp(bytes32)(uint256)" [POOL_ID] --rpc-url https://mainnet.base.org
+
+# MEV protection expires after 2 minutes (120 seconds)
+# If current time > creation + 120, protection is expired
+```
+
+**Expected Behavior**:
+- MEV protection lasts maximum 2 minutes
+- No-op module disables itself immediately
+- Custom MEV modules can disable themselves early
+
+### Liquidity Addition Blocked
+
+**Problem**: Cannot add liquidity to pool.
+
+**Cause**: MEV module is still active and blocking liquidity changes.
+
+**Solution**: Wait for MEV protection to expire (2 minutes max) or for module to disable itself.
+
+## Integration Issues
+
+### Contract Interface Errors
+
+**Problem**: ABI-related errors when calling contracts.
+
+**Solutions**:
+
+1. **Use correct ABI**: Ensure you're using the right ABI for each contract
+2. **Check function signatures**: Verify function names and parameter types
+3. **Verify contract addresses**: Use [official addresses](/reference/addresses)
+
+**Example Correct Calls**:
+```javascript
+// ✅ Correct
+const deploymentInfo = await factory.tokenDeploymentInfo(tokenAddress);
+
+// ❌ Wrong function name  
+const deploymentInfo = await factory.getTokenDeploymentInfo(tokenAddress);
+```
+
+### Gas Estimation Failures
+
+**Problem**: Gas estimation failing for deployments.
+
+**Solutions**:
+
+1. **Use higher gas limit**:
+   ```typescript
+   await factory.deployToken(config, {
+     gasLimit: 5_000_000  // High limit for deployments
+   });
+   ```
+
+2. **Check configuration validity**: Invalid configs can cause gas estimation to fail
+
+3. **Ensure sufficient ETH**: Account must have enough ETH for gas + extension amounts
+
+### Event Parsing Issues
+
+**Problem**: Cannot parse contract events properly.
+
+**Common Issues**:
+
+1. **Wrong event signature**:
+   ```typescript
+   // ✅ Correct
+   factory.on('TokenCreated', (sender, tokenAddress, ...args) => {
+     // Handle event
+   });
+   
+   // ❌ Wrong event name
+   factory.on('TokenDeployed', ...); // Event doesn't exist
+   ```
+
+2. **Missing ABI**: Ensure contract interface includes all events
+
+3. **Block range too large**: Limit historical queries to reasonable ranges
+
+## Network and RPC Issues
+
+### RPC Rate Limiting
+
+**Problem**: Getting rate limited by RPC provider.
+
+**Solutions**:
+
+1. **Use multiple RPC endpoints**:
+   ```typescript
+   const fallbackProviders = [
+     'https://mainnet.base.org',
+     'https://base-mainnet.public.blastapi.io',
+     // Add more as backup
+   ];
+   ```
+
+2. **Implement request caching**: Cache responses to reduce RPC calls
+
+3. **Add delays between requests**: Space out rapid successive calls
+
+### Transaction Failures
+
+**Problem**: Transactions failing with unclear errors.
+
+**Debugging Steps**:
+
+1. **Check transaction receipt**: Look for specific revert reason
+2. **Simulate transaction**: Use `staticCall` to debug before sending
+3. **Verify account state**: Ensure sufficient balance and nonces are correct
+4. **Check gas price**: Ensure gas price is appropriate for network conditions
+
+## Getting Help
+
+### Community Support
+
+**Discord**: [Join our community](https://discord.gg/feyprotocol)
+- Real-time help from community
+- Developer discussions
+- Troubleshooting assistance
+
+**GitHub**: [FEY Protocol Issues](https://github.com/feyprotocol)
+- Bug reports
+- Feature requests  
+- Technical discussions
+
+**Twitter**: [@feyprotocol](https://twitter.com/feyprotocol)
+- Protocol announcements
+- Status updates
+- Community updates
+
+### Reporting Bugs
+
+When reporting issues, please include:
+
+1. **Clear description** of the problem
+2. **Steps to reproduce** the issue
+3. **Expected vs actual behavior**
+4. **Error messages** (full stack trace if available)
+5. **Environment details** (browser, wallet, etc.)
+6. **Transaction hashes** for on-chain issues
+
+**Template**:
+```
+**Problem**: Brief description
+
+**Steps to Reproduce**:
+1. Step 1
+2. Step 2
+3. Error occurs
+
+**Expected**: What should happen
+**Actual**: What actually happens
+
+**Error Message**: 
+```
+Error details here
+```
+
+**Environment**:
+- Browser: Chrome 120
+- Wallet: MetaMask 11.0
+- Transaction: 0x123...
+
+**Additional Context**: Any other relevant information
+```
+
+### Emergency Contacts
+
+**Security Issues**: security@feyprotocol.xyz
+- Critical vulnerabilities
+- Potential exploits
+- Responsible disclosure
+
+**Critical Bugs**: Use GitHub issues with "critical" label
+- Protocol-breaking issues
+- Funds at risk scenarios
+
+---
+
+## Prevention Tips
+
+### Before Deployment
+
+- [ ] Validate all configuration arrays have correct lengths
+- [ ] Ensure reward/position BPS sum to exactly 10000
+- [ ] Verify extension addresses and data encoding
+- [ ] Test on small amounts first
+- [ ] Check factory and protocol status
+
+### During Integration
+
+- [ ] Use official contract addresses
+- [ ] Implement proper error handling
+- [ ] Add transaction confirmations
+- [ ] Cache frequently accessed data
+- [ ] Monitor for events and errors
+
+### Monitoring
+
+- [ ] Set up event listeners for critical functions
+- [ ] Monitor fee accumulation and distribution
+- [ ] Track protocol status changes
+- [ ] Alert on failed transactions
+
+**Related Documentation**:
+- [Contract Addresses →](/reference/addresses)
+- [Integration Guide →](/guides/integration)
+- [Cast Commands →](/guides/cast-commands)
+- [Security Guide →](/support/security)

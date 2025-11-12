@@ -1,0 +1,4 @@
+import{u as r,j as e}from"./index-B_EWvgIS.js";const s={title:"Security",description:"undefined"};function i(t){const n={a:"a",div:"div",h1:"h1",h2:"h2",header:"header",p:"p",...r(),...t.components};return e.jsxs(e.Fragment,{children:[e.jsx(n.header,{children:e.jsxs(n.h1,{id:"security",children:["Security",e.jsx(n.a,{"aria-hidden":"true",tabIndex:"-1",href:"#security",children:e.jsx(n.div,{"data-autolink-icon":!0})})]})}),`
+`,e.jsx(n.p,{children:"This page covers security considerations and best practices for the Fey protocol."}),`
+`,e.jsxs(n.h2,{id:"coming-soon",children:["Coming Soon",e.jsx(n.a,{"aria-hidden":"true",tabIndex:"-1",href:"#coming-soon",children:e.jsx(n.div,{"data-autolink-icon":!0})})]}),`
+`,e.jsx(n.p,{children:"Detailed security documentation will be available here."})]})}function a(t={}){const{wrapper:n}={...r(),...t.components};return n?e.jsx(n,{...t,children:e.jsx(i,{...t})}):i(t)}export{a as default,s as frontmatter};
