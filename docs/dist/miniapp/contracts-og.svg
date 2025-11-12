@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="contractBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0a2d;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#2d0c4d;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4a0a5a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="contractGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#4fc65f;stop-opacity:0.9" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#contractBg)"/>
+  
+  <!-- Code pattern background -->
+  <defs>
+    <pattern id="codePattern" width="200" height="20" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="200" height="20" fill="none"/>
+      <text x="5" y="15" font-family="monospace" font-size="12" fill="#00ff88" opacity="0.1">contract Factory {</text>
+    </pattern>
+  </defs>
+  <rect width="1200" height="800" fill="url(#codePattern)"/>
+  
+  <!-- Header -->
+  <g transform="translate(100, 80)">
+    <text x="0" y="0" font-family="system-ui, monospace" font-size="42" font-weight="bold" fill="#00ff88">
+      CORE CONTRACTS
+    </text>
+    <text x="0" y="40" font-family="system-ui, sans-serif" font-size="20" fill="#4fc65f">
+      Smart Contract Architecture & Implementation
+    </text>
+  </g>
+  
+  <!-- Contract Cards -->
+  <!-- Factory Contract -->
+  <g transform="translate(100, 180)">
+    <rect x="0" y="0" width="320" height="120" rx="15" fill="url(#contractGradient)" stroke="#00ff88" stroke-width="2"/>
+    <text x="20" y="35" font-family="system-ui, monospace" font-size="20" font-weight="bold" fill="black">Factory.sol</text>
+    <text x="20" y="55" font-family="system-ui, sans-serif" font-size="14" fill="black">Token deployment & management</text>
+    <text x="20" y="75" font-family="system-ui, sans-serif" font-size="12" fill="black">• Creates new tokens</text>
+    <text x="20" y="90" font-family="system-ui, sans-serif" font-size="12" fill="black">• Manages launches</text>
+    <text x="20" y="105" font-family="system-ui, sans-serif" font-size="12" fill="black">• Fee collection</text>
+    <text x="280" y="35" font-family="system-ui, monospace" font-size="24" fill="black">🏭</text>
+  </g>
+  
+  <!-- FEY Token Contract -->
+  <g transform="translate(460, 180)">
+    <rect x="0" y="0" width="320" height="120" rx="15" fill="url(#contractGradient)" stroke="#4fc65f" stroke-width="2"/>
+    <text x="20" y="35" font-family="system-ui, monospace" font-size="20" font-weight="bold" fill="black">FEYToken.sol</text>
+    <text x="20" y="55" font-family="system-ui, sans-serif" font-size="14" fill="black">Protocol governance token</text>
+    <text x="20" y="75" font-family="system-ui, sans-serif" font-size="12" fill="black">• 100B total supply</text>
+    <text x="20" y="90" font-family="system-ui, sans-serif" font-size="12" fill="black">• Staking rewards</text>
+    <text x="20" y="105" font-family="system-ui, sans-serif" font-size="12" fill="black">• Fee distribution</text>
+    <text x="280" y="35" font-family="system-ui, monospace" font-size="24" fill="black">💎</text>
+  </g>
+  
+  <!-- Hook System -->
+  <g transform="translate(100, 340)">
+    <rect x="0" y="0" width="320" height="120" rx="15" fill="url(#contractGradient)" stroke="#00ff88" stroke-width="2"/>
+    <text x="20" y="35" font-family="system-ui, monospace" font-size="20" font-weight="bold" fill="black">HookSystem.sol</text>
+    <text x="20" y="55" font-family="system-ui, sans-serif" font-size="14" fill="black">Extensible hook framework</text>
+    <text x="20" y="75" font-family="system-ui, sans-serif" font-size="12" fill="black">• Before/after hooks</text>
+    <text x="20" y="90" font-family="system-ui, sans-serif" font-size="12" fill="black">• Custom extensions</text>
+    <text x="20" y="105" font-family="system-ui, sans-serif" font-size="12" fill="black">• MEV protection</text>
+    <text x="280" y="35" font-family="system-ui, monospace" font-size="24" fill="black">🔗</text>
+  </g>
+  
+  <!-- LP Locker -->
+  <g transform="translate(460, 340)">
+    <rect x="0" y="0" width="320" height="120" rx="15" fill="url(#contractGradient)" stroke="#4fc65f" stroke-width="2"/>
+    <text x="20" y="35" font-family="system-ui, monospace" font-size="20" font-weight="bold" fill="black">LPLocker.sol</text>
+    <text x="20" y="55" font-family="system-ui, sans-serif" font-size="14" fill="black">Liquidity protection system</text>
+    <text x="20" y="75" font-family="system-ui, sans-serif" font-size="12" fill="black">• Locks LP tokens</text>
+    <text x="20" y="90" font-family="system-ui, sans-serif" font-size="12" fill="black">• Prevents rug pulls</text>
+    <text x="20" y="105" font-family="system-ui, sans-serif" font-size="12" fill="black">• Time-based release</text>
+    <text x="280" y="35" font-family="system-ui, monospace" font-size="24" fill="black">🔒</text>
+  </g>
+  
+  <!-- Fee Locker -->
+  <g transform="translate(100, 500)">
+    <rect x="0" y="0" width="320" height="120" rx="15" fill="url(#contractGradient)" stroke="#00ff88" stroke-width="2"/>
+    <text x="20" y="35" font-family="system-ui, monospace" font-size="20" font-weight="bold" fill="black">FeeLocker.sol</text>
+    <text x="20" y="55" font-family="system-ui, sans-serif" font-size="14" fill="black">Fee collection & distribution</text>
+    <text x="20" y="75" font-family="system-ui, sans-serif" font-size="12" fill="black">• Auto buybacks</text>
+    <text x="20" y="90" font-family="system-ui, sans-serif" font-size="12" fill="black">• Staker rewards</text>
+    <text x="20" y="105" font-family="system-ui, sans-serif" font-size="12" fill="black">• 100% distribution</text>
+    <text x="280" y="35" font-family="system-ui, monospace" font-size="24" fill="black">💰</text>
+  </g>
+  
+  <!-- Extensions -->
+  <g transform="translate(460, 500)">
+    <rect x="0" y="0" width="320" height="120" rx="15" fill="url(#contractGradient)" stroke="#4fc65f" stroke-width="2"/>
+    <text x="20" y="35" font-family="system-ui, monospace" font-size="20" font-weight="bold" fill="black">Extensions.sol</text>
+    <text x="20" y="55" font-family="system-ui, sans-serif" font-size="14" fill="black">Modular functionality</text>
+    <text x="20" y="75" font-family="system-ui, sans-serif" font-size="12" fill="black">• Plugin system</text>
+    <text x="20" y="90" font-family="system-ui, sans-serif" font-size="12" fill="black">• Custom features</text>
+    <text x="20" y="105" font-family="system-ui, sans-serif" font-size="12" fill="black">• Community driven</text>
+    <text x="280" y="35" font-family="system-ui, monospace" font-size="24" fill="black">🧩</text>
+  </g>
+  
+  <!-- Network Badge -->
+  <g transform="translate(900, 200)">
+    <rect x="0" y="0" width="200" height="400" rx="20" fill="rgba(10, 77, 26, 0.8)" stroke="#00ff88" stroke-width="2"/>
+    <text x="100" y="40" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#00ff88" text-anchor="middle">
+      Base Network
+    </text>
+    <text x="100" y="70" font-family="system-ui, sans-serif" font-size="14" fill="white" text-anchor="middle">
+      Deployed Contracts
+    </text>
+    
+    <text x="20" y="120" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#4fc65f">Factory:</text>
+    <text x="20" y="140" font-family="system-ui, monospace" font-size="10" fill="white">0x8EEF0dC80...</text>
+    
+    <text x="20" y="170" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#4fc65f">FEY Token:</text>
+    <text x="20" y="190" font-family="system-ui, monospace" font-size="10" fill="white">0xD09cf0982A...</text>
+    
+    <text x="20" y="220" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#4fc65f">Status:</text>
+    <text x="20" y="240" font-family="system-ui, sans-serif" font-size="12" fill="#00ff88">✅ Verified</text>
+    <text x="20" y="260" font-family="system-ui, sans-serif" font-size="12" fill="#00ff88">✅ Audited</text>
+    <text x="20" y="280" font-family="system-ui, sans-serif" font-size="12" fill="#00ff88">✅ Open Source</text>
+    
+    <!-- FEY Logo -->
+    <circle cx="100" cy="350" r="25" fill="#3ea34b" stroke="#00ff88" stroke-width="2" opacity="0.8"/>
+    <path d="M100,330 L105,345 L120,335 L110,355 L125,340 L105,360 L120,365 L100,365 L100,385 L95,365 L75,380 L85,360 L65,375 L90,355 L70,350 L95,350 L100,330 Z" 
+          fill="#00ff88"/>
+  </g>
+  
+  <!-- Footer -->
+  <text x="600" y="750" font-family="system-ui, sans-serif" font-size="16" fill="#4fc65f" text-anchor="middle">
+    Explore contract implementations, ABIs, and integration guides
+  </text>
+</svg>

@@ -1,3 +1,19 @@
+---
+title: "Getting Started with FEY Protocol"
+description: "Start your journey with FEY Protocol - comprehensive guides for stakers, creators, and developers"
+head:
+  - name: fc:miniapp
+    content: '{"version":"1","imageUrl":"https://feydocs.lat/miniapp/getting-started-og.svg","button":{"title":"🚀 Get Started","action":{"type":"launch_miniapp","name":"FEY Protocol Docs","url":"https://feydocs.lat/getting-started","splashImageUrl":"https://feydocs.lat/images/logo.svg","splashBackgroundColor":"#0a4d1a"}}}'
+  - name: fc:frame
+    content: '{"version":"1","imageUrl":"https://feydocs.lat/miniapp/getting-started-og.svg","button":{"title":"🚀 Get Started","action":{"type":"launch_frame","name":"FEY Protocol Docs","url":"https://feydocs.lat/getting-started","splashImageUrl":"https://feydocs.lat/images/logo.svg","splashBackgroundColor":"#0a4d1a"}}}'
+  - property: og:title
+    content: "Getting Started - FEY Protocol"
+  - property: og:description
+    content: "Start your journey with FEY Protocol - comprehensive guides for stakers, creators, and developers"
+  - property: og:image
+    content: "https://feydocs.lat/miniapp/getting-started-og.svg"
+---
+
 # Getting Started
 
 This guide will help you start using FEY Protocol, whether you want to stake $FEY, deploy a token, or integrate with the protocol.
@@ -5,8 +21,10 @@ This guide will help you start using FEY Protocol, whether you want to stake $FE
 ## Quick Overview
 
 FEY Protocol is live on **Base Mainnet** with these core contracts:
+
 - **Factory**: `0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d`
 - **FEY Token**: `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`
+- **xFeyVault (Staking)**: `0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50`
 - **Main Pool**: FEY/WETH on Uniswap V4
 
 ## For Token Stakers
@@ -14,6 +32,7 @@ FEY Protocol is live on **Base Mainnet** with these core contracts:
 ### 1. Get $FEY Tokens
 
 $FEY tokens are available on Uniswap V4 (FEY/WETH pool):
+
 - **Pool ID**: `0xe155c517c53f078f4b443c99436e42c1b80fd2fb1b3508f431c46b8365e4f3f0`
 - **Token Contract**: `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`
 
@@ -23,27 +42,40 @@ You can trade $FEY on any Uniswap V4 compatible interface. Make sure you're on B
 
 ### 2. Stake Your $FEY
 
-:::warning[Staking Contract Coming]
-The staking contract is still being finalized. For now, hold $FEY tokens in your wallet. Staking will be enabled in a future protocol update.
-:::
+The xFeyVault staking contract is **live** on Base Mainnet! Stake your $FEY tokens to earn rewards from protocol activity.
 
-Staking will provide:
+**Contract Address**: `0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50`
+
+Staking provides:
+
 - Protocol fees from all network activity
 - LP rewards from managed positions
 - Buyback distributions from WETH conversions
 
+The vault uses the ERC4626 standard, so you'll receive xFEY shares when you deposit $FEY tokens. Your share of the vault increases as fees accumulate and buybacks are executed.
+
+:::info[How to Stake]
+
+1. Approve the xFeyVault contract to spend your $FEY tokens
+2. Call `deposit(amount, receiver)` to stake your tokens
+3. You'll receive xFEY shares representing your stake
+4. Rewards are automatically compounded into the vault's value
+   :::
+
 ### 3. Monitor Your Rewards
 
-Once staking is live, you can:
-- Check rewards through the Fee Locker contract
-- Claim accumulated fees manually
-- View real-time protocol activity
+You can monitor your staking rewards by:
+
+- Checking your xFEY balance (shares increase in value as rewards accumulate)
+- Viewing the vault's total assets and your share percentage
+- Tracking buyback executions and fee claims through on-chain events
 
 ## For Token Creators
 
 ### 1. Prepare Your Token Metadata
 
 Before deploying, prepare:
+
 - **Name**: Your token name
 - **Symbol**: Token symbol (keep it short)
 - **Image**: Token logo/image URL
@@ -91,7 +123,7 @@ interface DeploymentConfig {
 Call the Factory contract:
 
 ```solidity
-function deployToken(DeploymentConfig memory config) 
+function deployToken(DeploymentConfig memory config)
   external payable returns (address tokenAddress);
 ```
 
@@ -102,6 +134,7 @@ Include ETH with your deployment to automatically purchase your tokens through t
 ### 4. Earn Creator Rewards
 
 After deployment:
+
 - Earn 1% of trading volume in $FEY
 - Receive LP rewards from protocol positions
 - Stake earned $FEY to compound returns
@@ -116,6 +149,7 @@ Key contracts for integration:
 const contracts = {
   factory: "0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d",
   feyToken: "0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D",
+  xFeyVault: "0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50",
   hook: "0x5B409184204b86f708d3aeBb3cad3F02835f68cC",
   feeLocker: "0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6",
   lpLocker: "0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa",
@@ -150,6 +184,7 @@ See [Building Extensions →](/guides/extensions) for detailed instructions.
 ### 4. Monitor Protocol Activity
 
 Track protocol events:
+
 - `TokenCreated`: New token deployments
 - `ClaimFees`: Fee distributions
 - `ExtensionTriggered`: Extension usage
@@ -164,29 +199,33 @@ Track protocol events:
 
 ### Key Addresses
 
-| Contract | Address |
-|----------|---------|
-| Factory | `0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d` |
-| FEY Token | `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D` |
-| Hook | `0x5B409184204b86f708d3aeBb3cad3F02835f68cC` |
-| Fee Locker | `0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6` |
-| LP Locker | `0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa` |
+| Contract            | Address                                      |
+| ------------------- | -------------------------------------------- |
+| Factory             | `0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d` |
+| FEY Token           | `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D` |
+| xFeyVault (Staking) | `0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50` |
+| Hook                | `0x5B409184204b86f708d3aeBb3cad3F02835f68cC` |
+| Fee Locker          | `0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6` |
+| LP Locker           | `0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa` |
 
 [View complete address list →](/reference/addresses)
 
 ## Support & Resources
 
 ### Documentation
+
 - **Architecture**: [Protocol Overview →](/architecture/overview)
 - **Contracts**: [Core Contracts →](/contracts/factory)
 - **Flows**: [Token Deployment →](/flows/deployment)
 
 ### Community
+
 - **GitHub**: https://github.com/feyprotocol
-- **Discord**: [Join community](https://discord.gg/feyprotocol) 
+- **Discord**: [Join community](https://discord.gg/feyprotocol)
 - **Twitter**: [@feyprotocol](https://twitter.com/feyprotocol)
 
 ### Help
+
 - **Troubleshooting**: [Common Issues →](/support/troubleshooting)
 - **Security**: [Security Guide →](/support/security)
 - **FAQ**: [Frequently Asked Questions →](/faq)

@@ -1,4 +1,0 @@
-import{u as a,j as n}from"./index-B_EWvgIS.js";const r={title:"Hook Contract",description:"undefined"};function o(e){const t={a:"a",div:"div",h1:"h1",h2:"h2",header:"header",p:"p",...a(),...e.components};return n.jsxs(n.Fragment,{children:[n.jsx(t.header,{children:n.jsxs(t.h1,{id:"hook-contract",children:["Hook Contract",n.jsx(t.a,{"aria-hidden":"true",tabIndex:"-1",href:"#hook-contract",children:n.jsx(t.div,{"data-autolink-icon":!0})})]})}),`
-`,n.jsx(t.p,{children:"This page documents the Hook contract functionality."}),`
-`,n.jsxs(t.h2,{id:"coming-soon",children:["Coming Soon",n.jsx(t.a,{"aria-hidden":"true",tabIndex:"-1",href:"#coming-soon",children:n.jsx(t.div,{"data-autolink-icon":!0})})]}),`
-`,n.jsx(t.p,{children:"Detailed Hook contract documentation will be available here."})]})}function c(e={}){const{wrapper:t}={...a(),...e.components};return t?n.jsx(t,{...e,children:n.jsx(o,{...e})}):o(e)}export{c as default,r as frontmatter};

@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="guidesBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d1a0a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#4d2d0c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6d4a0a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="guideGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#ffa500;stop-opacity:0.9" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#guidesBg)"/>
+  
+  <!-- Book pattern -->
+  <defs>
+    <pattern id="bookPattern" width="60" height="80" patternUnits="userSpaceOnUse">
+      <rect x="10" y="10" width="40" height="60" rx="2" fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.1"/>
+      <line x1="15" y1="20" x2="45" y2="20" stroke="#00ff88" stroke-width="0.3" opacity="0.1"/>
+      <line x1="15" y1="30" x2="45" y2="30" stroke="#00ff88" stroke-width="0.3" opacity="0.1"/>
+      <line x1="15" y1="40" x2="35" y2="40" stroke="#00ff88" stroke-width="0.3" opacity="0.1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bookPattern)"/>
+  
+  <!-- Header -->
+  <g transform="translate(100, 80)">
+    <text x="0" y="0" font-family="system-ui, sans-serif" font-size="48" font-weight="bold" fill="#00ff88">
+      DEVELOPER GUIDES
+    </text>
+    <text x="0" y="45" font-family="system-ui, sans-serif" font-size="22" fill="#ffa500">
+      Practical tutorials and implementation guides
+    </text>
+  </g>
+  
+  <!-- Guide Cards -->
+  <!-- Integration Guide -->
+  <g transform="translate(100, 180)">
+    <rect x="0" y="0" width="250" height="160" rx="12" fill="url(#guideGradient)" stroke="#00ff88" stroke-width="2"/>
+    <text x="20" y="35" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="black">Integration Guide</text>
+    <text x="20" y="55" font-family="system-ui, sans-serif" font-size="12" fill="black">Connect your app to FEY</text>
+    <text x="20" y="80" font-family="system-ui, sans-serif" font-size="11" fill="black">• SDK setup</text>
+    <text x="20" y="95" font-family="system-ui, sans-serif" font-size="11" fill="black">• Contract interaction</text>
+    <text x="20" y="110" font-family="system-ui, sans-serif" font-size="11" fill="black">• Best practices</text>
+    <text x="20" y="125" font-family="system-ui, sans-serif" font-size="11" fill="black">• Error handling</text>
+    <text x="210" y="35" font-family="system-ui, monospace" font-size="24" fill="black">🔗</text>
+  </g>
+  
+  <!-- Extensions Guide -->
+  <g transform="translate(380, 180)">
+    <rect x="0" y="0" width="250" height="160" rx="12" fill="url(#guideGradient)" stroke="#ffa500" stroke-width="2"/>
+    <text x="20" y="35" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="black">Building Extensions</text>
+    <text x="20" y="55" font-family="system-ui, sans-serif" font-size="12" fill="black">Create custom functionality</text>
+    <text x="20" y="80" font-family="system-ui, sans-serif" font-size="11" fill="black">• Hook development</text>
+    <text x="20" y="95" font-family="system-ui, sans-serif" font-size="11" fill="black">• Plugin architecture</text>
+    <text x="20" y="110" font-family="system-ui, sans-serif" font-size="11" fill="black">• Testing strategies</text>
+    <text x="20" y="125" font-family="system-ui, sans-serif" font-size="11" fill="black">• Deployment</text>
+    <text x="210" y="35" font-family="system-ui, monospace" font-size="24" fill="black">🧩</text>
+  </g>
+  
+  <!-- State Queries Guide -->
+  <g transform="translate(660, 180)">
+    <rect x="0" y="0" width="250" height="160" rx="12" fill="url(#guideGradient)" stroke="#00ff88" stroke-width="2"/>
+    <text x="20" y="35" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="black">State Queries</text>
+    <text x="20" y="55" font-family="system-ui, sans-serif" font-size="12" fill="black">Read protocol data efficiently</text>
+    <text x="20" y="80" font-family="system-ui, sans-serif" font-size="11" fill="black">• View functions</text>
+    <text x="20" y="95" font-family="system-ui, sans-serif" font-size="11" fill="black">• Event filtering</text>
+    <text x="20" y="110" font-family="system-ui, sans-serif" font-size="11" fill="black">• GraphQL queries</text>
+    <text x="20" y="125" font-family="system-ui, sans-serif" font-size="11" fill="black">• Caching strategies</text>
+    <text x="210" y="35" font-family="system-ui, monospace" font-size="24" fill="black">📊</text>
+  </g>
+  
+  <!-- Cast Commands Guide -->
+  <g transform="translate(100, 360)">
+    <rect x="0" y="0" width="250" height="160" rx="12" fill="url(#guideGradient)" stroke="#ffa500" stroke-width="2"/>
+    <text x="20" y="35" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="black">Cast Commands</text>
+    <text x="20" y="55" font-family="system-ui, sans-serif" font-size="12" fill="black">Farcaster integration tools</text>
+    <text x="20" y="80" font-family="system-ui, sans-serif" font-size="11" fill="black">• Frame commands</text>
+    <text x="20" y="95" font-family="system-ui, sans-serif" font-size="11" fill="black">• Bot interactions</text>
+    <text x="20" y="110" font-family="system-ui, sans-serif" font-size="11" fill="black">• Social features</text>
+    <text x="20" y="125" font-family="system-ui, sans-serif" font-size="11" fill="black">• Community tools</text>
+    <text x="210" y="35" font-family="system-ui, monospace" font-size="24" fill="black">📢</text>
+  </g>
+  
+  <!-- Token Deployment Guide -->
+  <g transform="translate(380, 360)">
+    <rect x="0" y="0" width="250" height="160" rx="12" fill="url(#guideGradient)" stroke="#00ff88" stroke-width="2"/>
+    <text x="20" y="35" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="black">Token Deployment</text>
+    <text x="20" y="55" font-family="system-ui, sans-serif" font-size="12" fill="black">Launch your own token</text>
+    <text x="20" y="80" font-family="system-ui, sans-serif" font-size="11" fill="black">• Factory interaction</text>
+    <text x="20" y="95" font-family="system-ui, sans-serif" font-size="11" fill="black">• Liquidity setup</text>
+    <text x="20" y="110" font-family="system-ui, sans-serif" font-size="11" fill="black">• Fair launch</text>
+    <text x="20" y="125" font-family="system-ui, sans-serif" font-size="11" fill="black">• Post-launch</text>
+    <text x="210" y="35" font-family="system-ui, monospace" font-size="24" fill="black">🚀</text>
+  </g>
+  
+  <!-- API Reference -->
+  <g transform="translate(660, 360)">
+    <rect x="0" y="0" width="250" height="160" rx="12" fill="url(#guideGradient)" stroke="#ffa500" stroke-width="2"/>
+    <text x="20" y="35" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="black">API Reference</text>
+    <text x="20" y="55" font-family="system-ui, sans-serif" font-size="12" fill="black">Complete API documentation</text>
+    <text x="20" y="80" font-family="system-ui, sans-serif" font-size="11" fill="black">• Function signatures</text>
+    <text x="20" y="95" font-family="system-ui, sans-serif" font-size="11" fill="black">• Parameter details</text>
+    <text x="20" y="110" font-family="system-ui, sans-serif" font-size="11" fill="black">• Return values</text>
+    <text x="20" y="125" font-family="system-ui, sans-serif" font-size="11" fill="black">• Code examples</text>
+    <text x="210" y="35" font-family="system-ui, monospace" font-size="24" fill="black">📋</text>
+  </g>
+  
+  <!-- Bottom Info Panel -->
+  <g transform="translate(100, 580)">
+    <rect x="0" y="0" width="810" height="100" rx="10" fill="rgba(77, 45, 12, 0.8)" stroke="#00ff88" stroke-width="2"/>
+    <text x="30" y="35" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" fill="#00ff88">
+      🛠️ Developer Resources
+    </text>
+    <text x="30" y="60" font-family="system-ui, sans-serif" font-size="14" fill="white">
+      All guides include practical examples, code snippets, and real-world implementations.
+    </text>
+    <text x="30" y="80" font-family="system-ui, sans-serif" font-size="14" fill="#ffa500">
+      Contribute to documentation • Open source • Community maintained
+    </text>
+    
+    <!-- GitHub link -->
+    <rect x="650" y="25" width="130" height="50" rx="8" fill="#00ff88" stroke="#4fc65f" stroke-width="1"/>
+    <text x="715" y="45" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="black" text-anchor="middle">
+      📚 GitHub
+    </text>
+    <text x="715" y="60" font-family="system-ui, sans-serif" font-size="11" fill="black" text-anchor="middle">
+      Contribute
+    </text>
+  </g>
+  
+  <!-- FEY logo -->
+  <g transform="translate(1000, 150)">
+    <circle cx="40" cy="40" r="35" fill="#3ea34b" stroke="#00ff88" stroke-width="2" opacity="0.8"/>
+    <path d="M40,15 L45,35 L60,20 L50,40 L70,25 L45,45 L65,50 L40,50 L40,70 L35,50 L15,65 L25,45 L5,60 L30,40 L10,35 L35,35 L40,15 Z" 
+          fill="#00ff88"/>
+  </g>
+  
+  <!-- Decorative elements -->
+  <circle cx="1100" cy="400" r="15" fill="#ffa500" opacity="0.3"/>
+  <circle cx="50" cy="300" r="10" fill="#00ff88" opacity="0.4"/>
+  <circle cx="980" cy="550" r="8" fill="#ffa500" opacity="0.5"/>
+</svg>

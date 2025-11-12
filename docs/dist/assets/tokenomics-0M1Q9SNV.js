@@ -1,4 +1,0 @@
-import{u as i,j as e}from"./index-B_EWvgIS.js";const a={title:"Tokenomics",description:"undefined"};function t(o){const n={a:"a",div:"div",h1:"h1",h2:"h2",header:"header",p:"p",...i(),...o.components};return e.jsxs(e.Fragment,{children:[e.jsx(n.header,{children:e.jsxs(n.h1,{id:"tokenomics",children:["Tokenomics",e.jsx(n.a,{"aria-hidden":"true",tabIndex:"-1",href:"#tokenomics",children:e.jsx(n.div,{"data-autolink-icon":!0})})]})}),`
-`,e.jsx(n.p,{children:"This page explains the token economics and mechanisms of the Fey protocol."}),`
-`,e.jsxs(n.h2,{id:"coming-soon",children:["Coming Soon",e.jsx(n.a,{"aria-hidden":"true",tabIndex:"-1",href:"#coming-soon",children:e.jsx(n.div,{"data-autolink-icon":!0})})]}),`
-`,e.jsx(n.p,{children:"Detailed tokenomics documentation will be available here."})]})}function d(o={}){const{wrapper:n}={...i(),...o.components};return n?e.jsx(n,{...o,children:e.jsx(t,{...o})}):t(o)}export{d as default,a as frontmatter};

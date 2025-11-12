@@ -1,5 +1,58 @@
 import { defineConfig } from 'vocs'
 
+// Farcaster miniapp embed configurations for different routes
+const getFarcasterEmbed = (route: string = '') => {
+  const baseUrl = 'https://feydocs.lat'
+  
+  const embedConfigs: Record<string, any> = {
+    '/': {
+      imageUrl: `${baseUrl}/miniapp/home-og.svg`,
+      buttonTitle: '📚 Explore Docs',
+      description: 'Learn about FEY Protocol - the first fully permissionless, user-owned launchpad on Base'
+    },
+    '/getting-started': {
+      imageUrl: `${baseUrl}/miniapp/getting-started-og.svg`,
+      buttonTitle: '🚀 Get Started',
+      description: 'Start your journey with FEY Protocol - comprehensive guides and tutorials'
+    },
+    '/architecture': {
+      imageUrl: `${baseUrl}/miniapp/architecture-og.svg`,
+      buttonTitle: '🏗️ Explore Architecture',
+      description: 'Deep dive into FEY Protocol architecture and smart contract design'
+    },
+    '/contracts': {
+      imageUrl: `${baseUrl}/miniapp/contracts-og.svg`,
+      buttonTitle: '📋 View Contracts',
+      description: 'Explore FEY Protocol smart contracts - Factory, Token, Hooks and more'
+    },
+    '/guides': {
+      imageUrl: `${baseUrl}/miniapp/guides-og.svg`,
+      buttonTitle: '📖 Developer Guides',
+      description: 'Practical tutorials for building with FEY Protocol'
+    }
+  }
+  
+  // Find the best match for the route
+  const config = embedConfigs[route] || 
+    embedConfigs[`/${route.split('/')[1]}`] ||
+    embedConfigs['/']
+  
+  return {
+    version: "1",
+    imageUrl: config.imageUrl,
+    button: {
+      title: config.buttonTitle,
+      action: {
+        type: "launch_miniapp",
+        name: "FEY Protocol Docs",
+        url: `${baseUrl}${route}`,
+        splashImageUrl: `${baseUrl}/images/logo.svg`,
+        splashBackgroundColor: "#0a4d1a"
+      }
+    }
+  }
+}
+
 export default defineConfig({
   title: 'FEY Protocol',
   head: [
@@ -23,6 +76,78 @@ export default defineConfig({
       {
         rel: 'stylesheet',
         href: 'https://fonts.googleapis.com/css2?family=Golos+Text:wght@400..900&display=swap'
+      }
+    ],
+    // Farcaster miniapp meta tags - default home page
+    [
+      'meta',
+      {
+        name: 'fc:miniapp',
+        content: JSON.stringify(getFarcasterEmbed('/'))
+      }
+    ],
+    [
+      'meta',
+      {
+        name: 'fc:frame', // Backward compatibility
+        content: JSON.stringify(getFarcasterEmbed('/'))
+      }
+    ],
+    // OpenGraph meta tags for better social sharing
+    [
+      'meta',
+      {
+        property: 'og:title',
+        content: 'FEY Protocol Documentation'
+      }
+    ],
+    [
+      'meta',
+      {
+        property: 'og:description',
+        content: 'Complete technical documentation for FEY Protocol - the first fully permissionless, user-owned launchpad on Base.'
+      }
+    ],
+    [
+      'meta',
+      {
+        property: 'og:image',
+        content: 'https://feydocs.lat/miniapp/home-og.svg'
+      }
+    ],
+    [
+      'meta',
+      {
+        property: 'og:type',
+        content: 'website'
+      }
+    ],
+    [
+      'meta',
+      {
+        name: 'twitter:card',
+        content: 'summary_large_image'
+      }
+    ],
+    [
+      'meta',
+      {
+        name: 'twitter:title',
+        content: 'FEY Protocol Documentation'
+      }
+    ],
+    [
+      'meta',
+      {
+        name: 'twitter:description',
+        content: 'Learn about FEY Protocol - the first fully permissionless, user-owned launchpad on Base'
+      }
+    ],
+    [
+      'meta',
+      {
+        name: 'twitter:image',
+        content: 'https://feydocs.lat/miniapp/home-og.svg'
       }
     ],
     [
@@ -84,7 +209,7 @@ export default defineConfig({
     light: '/images/logo.svg',
     dark: '/images/logo.svg'
   },
-  iconUrl: '/favicon.ico',
+  iconUrl: '/images/logo.svg',
   theme: {
     colorScheme: 'dark',
     accentColor: '#00ff88', // FEY green from branding

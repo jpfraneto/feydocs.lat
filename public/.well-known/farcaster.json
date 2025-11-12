@@ -1,0 +1,26 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjE2MDk4LCJ0eXBlIjoiY3VzdG9keSIsImtleSI6IjB4YUIyMERlOGY1QTRmOGUxNDdCYWFDOUQxZjZlMjM2ODYxNDg1NTE2QSJ9",
+    "payload": "eyJkb21haW4iOiJmZXlkb2NzLmxhdCJ9",
+    "signature": "5Vjp4SsyqVcBMBYEQ5ITXYt7vi7pdIBng3rI2YPkrQ9KKNLwleKc58YmDgRlQdfTcqqso0FsQWzotE6IUmn3vRw="
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "FEY Protocol Docs",
+    "iconUrl": "https://feydocs.lat/images/logo.svg",
+    "homeUrl": "https://feydocs.lat",
+    "imageUrl": "https://feydocs.lat/miniapp/home-og.svg",
+    "buttonTitle": "🕳️ Rabbit Hole",
+    "splashImageUrl": "https://feydocs.lat/images/logo.svg",
+    "splashBackgroundColor": "#0a4d1a",
+    "subtitle": "Docs for FEY",
+    "description": "Docs for FEY",
+    "primaryCategory": "art-creativity",
+    "tags": ["defi", "launchpad", "protocol", "yield", "money"],
+    "heroImageUrl": "https://feydocs.lat/miniapp/hero-og.svg",
+    "tagline": "Docs for FEY",
+    "ogTitle": "Docs for FEY",
+    "ogDescription": "Docs for FEY",
+    "ogImageUrl": "https://feydocs.lat/miniapp/home-og.svg"
+  }
+}

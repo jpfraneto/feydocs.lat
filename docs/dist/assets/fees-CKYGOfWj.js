@@ -1,0 +1,4 @@
+import{u as a,j as e}from"./index-CwpwL8we.js";const s={title:"Fees",description:"undefined"};function i(t){const n={a:"a",div:"div",h1:"h1",h2:"h2",header:"header",p:"p",...a(),...t.components};return e.jsxs(e.Fragment,{children:[e.jsx(n.header,{children:e.jsxs(n.h1,{id:"fees",children:["Fees",e.jsx(n.a,{"aria-hidden":"true",tabIndex:"-1",href:"#fees",children:e.jsx(n.div,{"data-autolink-icon":!0})})]})}),`
+`,e.jsx(n.p,{children:"This page explains the fee structure and mechanism in the Fey protocol."}),`
+`,e.jsxs(n.h2,{id:"coming-soon",children:["Coming Soon",e.jsx(n.a,{"aria-hidden":"true",tabIndex:"-1",href:"#coming-soon",children:e.jsx(n.div,{"data-autolink-icon":!0})})]}),`
+`,e.jsx(n.p,{children:"Detailed fees documentation will be available here."})]})}function r(t={}){const{wrapper:n}={...a(),...t.components};return n?e.jsx(n,{...t,children:e.jsx(i,{...t})}):i(t)}export{r as default,s as frontmatter};

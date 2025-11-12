@@ -459,6 +459,7 @@ FEY Protocol is live on **Base Mainnet** with these core contracts:
 
 * **Factory**: `0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d`
 * **FEY Token**: `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D`
+* **xFeyVault (Staking)**: `0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50`
 * **Main Pool**: FEY/WETH on Uniswap V4
 
 ### For Token Stakers
@@ -476,23 +477,32 @@ You can trade $FEY on any Uniswap V4 compatible interface. Make sure you're on B
 
 #### 2. Stake Your $FEY
 
-:::warning[Staking Contract Coming]
-The staking contract is still being finalized. For now, hold $FEY tokens in your wallet. Staking will be enabled in a future protocol update.
-:::
+The xFeyVault staking contract is **live** on Base Mainnet! Stake your $FEY tokens to earn rewards from protocol activity.
 
-Staking will provide:
+**Contract Address**: `0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50`
+
+Staking provides:
 
 * Protocol fees from all network activity
 * LP rewards from managed positions
 * Buyback distributions from WETH conversions
 
+The vault uses the ERC4626 standard, so you'll receive xFEY shares when you deposit $FEY tokens. Your share of the vault increases as fees accumulate and buybacks are executed.
+
+:::info[How to Stake]
+1. Approve the xFeyVault contract to spend your $FEY tokens
+2. Call `deposit(amount, receiver)` to stake your tokens
+3. You'll receive xFEY shares representing your stake
+4. Rewards are automatically compounded into the vault's value
+:::
+
 #### 3. Monitor Your Rewards
 
-Once staking is live, you can:
+You can monitor your staking rewards by:
 
-* Check rewards through the Fee Locker contract
-* Claim accumulated fees manually
-* View real-time protocol activity
+* Checking your xFEY balance (shares increase in value as rewards accumulate)
+* Viewing the vault's total assets and your share percentage
+* Tracking buyback executions and fee claims through on-chain events
 
 ### For Token Creators
 
@@ -547,7 +557,7 @@ interface DeploymentConfig {
 Call the Factory contract:
 
 ```solidity
-function deployToken(DeploymentConfig memory config) 
+function deployToken(DeploymentConfig memory config)
   external payable returns (address tokenAddress);
 ```
 
@@ -573,6 +583,7 @@ Key contracts for integration:
 const contracts = {
   factory: "0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d",
   feyToken: "0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D",
+  xFeyVault: "0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50",
   hook: "0x5B409184204b86f708d3aeBb3cad3F02835f68cC",
   feeLocker: "0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6",
   lpLocker: "0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa",
@@ -622,13 +633,14 @@ Track protocol events:
 
 #### Key Addresses
 
-| Contract   | Address                                      |
-| ---------- | -------------------------------------------- |
-| Factory    | `0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d` |
-| FEY Token  | `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D` |
-| Hook       | `0x5B409184204b86f708d3aeBb3cad3F02835f68cC` |
-| Fee Locker | `0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6` |
-| LP Locker  | `0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa` |
+| Contract            | Address                                      |
+| ------------------- | -------------------------------------------- |
+| Factory             | `0x8EEF0dC80ADf57908bB1be0236c2a72a7e379C2d` |
+| FEY Token           | `0xD09cf0982A32DD6856e12d6BF2F08A822eA5D91D` |
+| xFeyVault (Staking) | `0x72f5565Ab147105614ca4Eb83ecF15f751Fd8C50` |
+| Hook                | `0x5B409184204b86f708d3aeBb3cad3F02835f68cC` |
+| Fee Locker          | `0xf739FC4094F3Df0a1Be08E2925b609F3C3Aa13c6` |
+| LP Locker           | `0x975aF6a738f502935AFE64633Ad3EA2A3eb3e7Fa` |
 
 [View complete address list →](/reference/addresses)
 

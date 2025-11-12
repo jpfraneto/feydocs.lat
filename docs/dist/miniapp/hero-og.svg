@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a4d1a;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#0c6300;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#3ea34b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4fc65f;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#00ff88;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#heroGradient)"/>
+  <rect width="1200" height="800" fill="url(#centerGlow)"/>
+  
+  <!-- Animated circles -->
+  <circle cx="200" cy="150" r="80" fill="none" stroke="#00ff88" stroke-width="1" opacity="0.3"/>
+  <circle cx="1000" cy="650" r="120" fill="none" stroke="#4fc65f" stroke-width="1" opacity="0.2"/>
+  <circle cx="950" cy="200" r="60" fill="none" stroke="#00ff88" stroke-width="1" opacity="0.4"/>
+  
+  <!-- Central Content -->
+  <g transform="translate(600, 400)" text-anchor="middle">
+    <!-- Large FEY Logo -->
+    <circle cx="0" cy="-50" r="60" fill="#00ff88" opacity="0.9"/>
+    <path d="M0,-90 L10,-60 L35,-80 L20,-50 L45,-65 L15,-35 L40,-25 L0,-25 L0,10 L-10,-25 L-35,-10 L-20,-35 L-45,-20 L-15,-50 L-40,-60 L-10,-60 L0,-90 Z" 
+          fill="#0a4d1a"/>
+    
+    <!-- Main Title -->
+    <text x="0" y="80" font-family="system-ui, sans-serif" font-size="56" font-weight="bold" fill="white">
+      FEY PROTOCOL
+    </text>
+    <text x="0" y="130" font-family="system-ui, sans-serif" font-size="28" fill="#4fc65f">
+      Permissionless • User-Owned • Base Network
+    </text>
+    
+    <!-- Tagline -->
+    <text x="0" y="180" font-family="system-ui, sans-serif" font-size="22" fill="white" opacity="0.9">
+      Complete Technical Documentation
+    </text>
+  </g>
+  
+  <!-- Feature Icons -->
+  <g transform="translate(150, 600)">
+    <circle cx="0" cy="0" r="25" fill="#00ff88" opacity="0.2"/>
+    <text x="0" y="8" font-family="system-ui, sans-serif" font-size="24" text-anchor="middle">💰</text>
+    <text x="0" y="50" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="white">Staking</text>
+  </g>
+  
+  <g transform="translate(350, 600)">
+    <circle cx="0" cy="0" r="25" fill="#4fc65f" opacity="0.2"/>
+    <text x="0" y="8" font-family="system-ui, sans-serif" font-size="24" text-anchor="middle">🏭</text>
+    <text x="0" y="50" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="white">Launch</text>
+  </g>
+  
+  <g transform="translate(850, 600)">
+    <circle cx="0" cy="0" r="25" fill="#00ff88" opacity="0.2"/>
+    <text x="0" y="8" font-family="system-ui, sans-serif" font-size="24" text-anchor="middle">🔧</text>
+    <text x="0" y="50" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="white">Build</text>
+  </g>
+  
+  <g transform="translate(1050, 600)">
+    <circle cx="0" cy="0" r="25" fill="#4fc65f" opacity="0.2"/>
+    <text x="0" y="8" font-family="system-ui, sans-serif" font-size="24" text-anchor="middle">📊</text>
+    <text x="0" y="50" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="white">Analytics</text>
+  </g>
+  
+  <!-- Network Badge -->
+  <g transform="translate(100, 100)">
+    <rect x="0" y="0" width="180" height="50" rx="25" fill="#0a4d1a" stroke="#00ff88" stroke-width="2"/>
+    <text x="90" y="32" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#00ff88" text-anchor="middle">
+      BASE NETWORK
+    </text>
+  </g>
+</svg>

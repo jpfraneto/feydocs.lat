@@ -1,0 +1,4 @@
+import{u as o,j as n}from"./index-CwpwL8we.js";const r={title:"Extensions",description:"undefined"};function i(t){const e={a:"a",div:"div",h1:"h1",h2:"h2",header:"header",p:"p",...o(),...t.components};return n.jsxs(n.Fragment,{children:[n.jsx(e.header,{children:n.jsxs(e.h1,{id:"extensions",children:["Extensions",n.jsx(e.a,{"aria-hidden":"true",tabIndex:"-1",href:"#extensions",children:n.jsx(e.div,{"data-autolink-icon":!0})})]})}),`
+`,n.jsx(e.p,{children:"This page provides information about extending the Fey protocol."}),`
+`,n.jsxs(e.h2,{id:"coming-soon",children:["Coming Soon",n.jsx(e.a,{"aria-hidden":"true",tabIndex:"-1",href:"#coming-soon",children:n.jsx(e.div,{"data-autolink-icon":!0})})]}),`
+`,n.jsx(e.p,{children:"Detailed documentation for extensions will be available here."})]})}function a(t={}){const{wrapper:e}={...o(),...t.components};return e?n.jsx(e,{...t,children:n.jsx(i,{...t})}):i(t)}export{a as default,r as frontmatter};

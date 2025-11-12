@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="archBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a1a2d;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0c2d4d;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a4d5a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#4fc65f;stop-opacity:0.8" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#archBg)"/>
+  
+  <!-- Grid Pattern -->
+  <defs>
+    <pattern id="techGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#00ff88" stroke-width="0.3" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="800" fill="url(#techGrid)"/>
+  
+  <!-- Header -->
+  <g transform="translate(100, 80)">
+    <text x="0" y="0" font-family="system-ui, monospace" font-size="42" font-weight="bold" fill="#00ff88">
+      FEY ARCHITECTURE
+    </text>
+    <text x="0" y="40" font-family="system-ui, sans-serif" font-size="20" fill="#4fc65f">
+      Protocol Overview & Contract Design
+    </text>
+  </g>
+  
+  <!-- Architecture Diagram -->
+  <!-- Factory Contract -->
+  <g transform="translate(200, 200)">
+    <rect x="0" y="0" width="160" height="80" rx="10" fill="url(#nodeGradient)" stroke="#00ff88" stroke-width="2"/>
+    <text x="80" y="30" font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="black" text-anchor="middle">Factory</text>
+    <text x="80" y="50" font-family="system-ui, sans-serif" font-size="14" fill="black" text-anchor="middle">Token Creator</text>
+    <text x="80" y="65" font-family="system-ui, sans-serif" font-size="12" fill="black" text-anchor="middle">0x8EEF...C2d</text>
+  </g>
+  
+  <!-- FEY Token -->
+  <g transform="translate(450, 150)">
+    <rect x="0" y="0" width="160" height="80" rx="10" fill="url(#nodeGradient)" stroke="#4fc65f" stroke-width="2"/>
+    <text x="80" y="30" font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="black" text-anchor="middle">FEY Token</text>
+    <text x="80" y="50" font-family="system-ui, sans-serif" font-size="14" fill="black" text-anchor="middle">Protocol Token</text>
+    <text x="80" y="65" font-family="system-ui, sans-serif" font-size="12" fill="black" text-anchor="middle">100B Supply</text>
+  </g>
+  
+  <!-- Hook System -->
+  <g transform="translate(450, 300)">
+    <rect x="0" y="0" width="160" height="80" rx="10" fill="url(#nodeGradient)" stroke="#00ff88" stroke-width="2"/>
+    <text x="80" y="30" font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="black" text-anchor="middle">Hook System</text>
+    <text x="80" y="50" font-family="system-ui, sans-serif" font-size="14" fill="black" text-anchor="middle">Extensions</text>
+    <text x="80" y="65" font-family="system-ui, sans-serif" font-size="12" fill="black" text-anchor="middle">Modular</text>
+  </g>
+  
+  <!-- Fee Distribution -->
+  <g transform="translate(700, 200)">
+    <rect x="0" y="0" width="160" height="80" rx="10" fill="url(#nodeGradient)" stroke="#4fc65f" stroke-width="2"/>
+    <text x="80" y="30" font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="black" text-anchor="middle">Fee System</text>
+    <text x="80" y="50" font-family="system-ui, sans-serif" font-size="14" fill="black" text-anchor="middle">100% to Stakers</text>
+    <text x="80" y="65" font-family="system-ui, sans-serif" font-size="12" fill="black" text-anchor="middle">Auto Buyback</text>
+  </g>
+  
+  <!-- Connections -->
+  <line x1="360" y1="240" x2="450" y2="190" stroke="#00ff88" stroke-width="3" opacity="0.7"/>
+  <line x1="360" y1="240" x2="450" y2="340" stroke="#00ff88" stroke-width="3" opacity="0.7"/>
+  <line x1="610" y1="190" x2="700" y2="240" stroke="#4fc65f" stroke-width="3" opacity="0.7"/>
+  <line x1="610" y1="340" x2="700" y2="280" stroke="#00ff88" stroke-width="3" opacity="0.7"/>
+  
+  <!-- Flow arrows -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" 
+      refX="0" refY="3.5" orient="auto" fill="#00ff88">
+      <polygon points="0 0, 10 3.5, 0 7" />
+    </marker>
+  </defs>
+  
+  <!-- Key Features -->
+  <g transform="translate(200, 450)">
+    <text x="0" y="0" font-family="system-ui, sans-serif" font-size="24" font-weight="600" fill="#00ff88">
+      Architecture Features
+    </text>
+    <text x="0" y="40" font-family="system-ui, sans-serif" font-size="16" fill="white">
+      • Modular design with upgradeable components
+    </text>
+    <text x="0" y="65" font-family="system-ui, sans-serif" font-size="16" fill="white">
+      • Automatic fee distribution and buybacks
+    </text>
+    <text x="0" y="90" font-family="system-ui, sans-serif" font-size="16" fill="white">
+      • Permissionless token creation and trading
+    </text>
+    <text x="0" y="115" font-family="system-ui, sans-serif" font-size="16" fill="white">
+      • MEV protection and fair launch mechanics
+    </text>
+  </g>
+  
+  <!-- Network info -->
+  <g transform="translate(200, 620)">
+    <rect x="0" y="0" width="400" height="50" rx="10" fill="#0a4d1a" stroke="#00ff88" stroke-width="1"/>
+    <text x="20" y="32" font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="#00ff88">
+      Base Mainnet • Uniswap V4 • 100% Decentralized
+    </text>
+  </g>
+  
+  <!-- Logo -->
+  <g transform="translate(900, 100)">
+    <circle cx="40" cy="40" r="35" fill="#3ea34b" stroke="#00ff88" stroke-width="2" opacity="0.8"/>
+    <path d="M40,15 L45,35 L60,20 L50,40 L70,25 L45,45 L65,50 L40,50 L40,70 L35,50 L15,65 L25,45 L5,60 L30,40 L10,35 L35,35 L40,15 Z" 
+          fill="#00ff88"/>
+  </g>
+</svg>

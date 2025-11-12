@@ -1,4 +1,0 @@
-import{u as a,j as n}from"./index-B_EWvgIS.js";const i={title:"Contracts",description:"undefined"};function o(t){const e={a:"a",div:"div",h1:"h1",h2:"h2",header:"header",p:"p",...a(),...t.components};return n.jsxs(n.Fragment,{children:[n.jsx(e.header,{children:n.jsxs(e.h1,{id:"contracts",children:["Contracts",n.jsx(e.a,{"aria-hidden":"true",tabIndex:"-1",href:"#contracts",children:n.jsx(e.div,{"data-autolink-icon":!0})})]})}),`
-`,n.jsx(e.p,{children:"This page provides an overview of all smart contracts in the Fey protocol."}),`
-`,n.jsxs(e.h2,{id:"coming-soon",children:["Coming Soon",n.jsx(e.a,{"aria-hidden":"true",tabIndex:"-1",href:"#coming-soon",children:n.jsx(e.div,{"data-autolink-icon":!0})})]}),`
-`,n.jsx(e.p,{children:"Detailed contracts documentation will be available here."})]})}function s(t={}){const{wrapper:e}={...a(),...t.components};return e?n.jsx(e,{...t,children:n.jsx(o,{...t})}):o(t)}export{s as default,i as frontmatter};
