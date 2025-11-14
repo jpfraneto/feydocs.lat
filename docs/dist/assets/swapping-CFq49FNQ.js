@@ -1,4 +1,0 @@
-import{u as o,j as n}from"./index-CwpwL8we.js";const s={title:"Swapping Flow",description:"undefined"};function t(i){const e={a:"a",div:"div",h1:"h1",h2:"h2",header:"header",p:"p",...o(),...i.components};return n.jsxs(n.Fragment,{children:[n.jsx(e.header,{children:n.jsxs(e.h1,{id:"swapping-flow",children:["Swapping Flow",n.jsx(e.a,{"aria-hidden":"true",tabIndex:"-1",href:"#swapping-flow",children:n.jsx(e.div,{"data-autolink-icon":!0})})]})}),`
-`,n.jsx(e.p,{children:"This page describes the token swapping process in the Fey protocol."}),`
-`,n.jsxs(e.h2,{id:"coming-soon",children:["Coming Soon",n.jsx(e.a,{"aria-hidden":"true",tabIndex:"-1",href:"#coming-soon",children:n.jsx(e.div,{"data-autolink-icon":!0})})]}),`
-`,n.jsx(e.p,{children:"Detailed swapping flow documentation will be available here."})]})}function r(i={}){const{wrapper:e}={...o(),...i.components};return e?n.jsx(e,{...i,children:n.jsx(t,{...i})}):t(i)}export{r as default,s as frontmatter};

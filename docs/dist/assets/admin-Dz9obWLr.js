@@ -1,0 +1,4 @@
+import{u as d,j as n}from"./index-2G0pCPg9.js";const o={title:"Admin",description:"undefined"};function t(i){const e={a:"a",div:"div",h1:"h1",h2:"h2",header:"header",p:"p",...d(),...i.components};return n.jsxs(n.Fragment,{children:[n.jsx(e.header,{children:n.jsxs(e.h1,{id:"admin",children:["Admin",n.jsx(e.a,{"aria-hidden":"true",tabIndex:"-1",href:"#admin",children:n.jsx(e.div,{"data-autolink-icon":!0})})]})}),`
+`,n.jsx(e.p,{children:"This page covers administrative functions and procedures."}),`
+`,n.jsxs(e.h2,{id:"coming-soon",children:["Coming Soon",n.jsx(e.a,{"aria-hidden":"true",tabIndex:"-1",href:"#coming-soon",children:n.jsx(e.div,{"data-autolink-icon":!0})})]}),`
+`,n.jsx(e.p,{children:"Detailed admin documentation will be available here."})]})}function r(i={}){const{wrapper:e}={...d(),...i.components};return e?n.jsx(e,{...i,children:n.jsx(t,{...i})}):t(i)}export{r as default,o as frontmatter};

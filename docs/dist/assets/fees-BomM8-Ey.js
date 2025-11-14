@@ -1,0 +1,4 @@
+import{u as o,j as e}from"./index-2G0pCPg9.js";const d={title:"Fee Flow",description:"undefined"};function i(t){const n={a:"a",div:"div",h1:"h1",h2:"h2",header:"header",p:"p",...o(),...t.components};return e.jsxs(e.Fragment,{children:[e.jsx(n.header,{children:e.jsxs(n.h1,{id:"fee-flow",children:["Fee Flow",e.jsx(n.a,{"aria-hidden":"true",tabIndex:"-1",href:"#fee-flow",children:e.jsx(n.div,{"data-autolink-icon":!0})})]})}),`
+`,e.jsx(n.p,{children:"This page explains how fees are processed and distributed."}),`
+`,e.jsxs(n.h2,{id:"coming-soon",children:["Coming Soon",e.jsx(n.a,{"aria-hidden":"true",tabIndex:"-1",href:"#coming-soon",children:e.jsx(n.div,{"data-autolink-icon":!0})})]}),`
+`,e.jsx(n.p,{children:"Detailed fee flow documentation will be available here."})]})}function r(t={}){const{wrapper:n}={...o(),...t.components};return n?e.jsx(n,{...t,children:e.jsx(i,{...t})}):i(t)}export{r as default,d as frontmatter};

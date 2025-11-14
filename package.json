@@ -9,6 +9,7 @@
     "preview": "vocs preview"
   },
   "dependencies": {
+    "@farcaster/miniapp-sdk": "^0.2.1",
     "react": "latest",
     "react-dom": "latest",
     "vocs": "latest"

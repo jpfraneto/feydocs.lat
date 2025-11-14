@@ -1,4 +1,4 @@
-# FEY Protocol
+# FEY Protocol Docs
 
 > The first fully permissionless, user-owned launchpad
 
